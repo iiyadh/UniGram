@@ -10,6 +10,8 @@ async function createTables() {
       password TEXT NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      imgURL TEXT,
+      account_status TEXT CHECK (account_status IN ('active', 'inactive', 'blocked')) DEFAULT 'inactive',
       role TEXT CHECK (role IN ('student', 'teacher', 'admin', 'chef')) DEFAULT 'student',
       reset_token TEXT,
       reset_token_expires TIMESTAMP
