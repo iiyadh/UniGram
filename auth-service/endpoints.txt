@@ -1,0 +1,21 @@
+POST 'http://localhost:5000/api/auth/login'
+{
+    "cin":"00214573",
+    "password":"123123123"
+}
+POST 'http://localhost:5000/api/auth/refrech'
+POST 'http://localhost:5000/api/auth/logout'
+
+
+{token required}
+GET  'http://localhost:5000/api/auth/validate'
+{}
+
+POST 'http://localhost:5000/api/password/forgot'
+{
+    "email":"tabaiiyadh317@gmail.com"
+}
+POST 'http://localhost:5000/api/password/reset/:token'
+{
+    "newPassword":"iyadh123"
+}

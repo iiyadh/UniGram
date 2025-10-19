@@ -1,24 +1,5 @@
-const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-const validateUID = async (req ,res , next) =>{
-    try{
-        const user = await User.findById(req.userId);
-        if (!user) {
-            res.clearCookie('token', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-        });
-            return res.status(404).json({ message: 'User not found' });
-        }
-        req.user = user; // Adding user to request object for convenience
-        next();
-    }catch(err){
-        console.error(err);
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-}
 
 const authenticateToken = (req,res,next)=>{
     const authHeader = req.headers['authorization'];
@@ -33,5 +14,4 @@ const authenticateToken = (req,res,next)=>{
 
 module.exports = {
     authenticateToken,
-    validateUID
 };

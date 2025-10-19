@@ -7,9 +7,8 @@ router.post('/login',login);
 router.post('/refrech',refresh);
 router.post('/logout',logout);
 
-router.get('/isValidAuth',authenticateToken,validateUID,(req, res) => {
-    const { password, ...userWithoutPassword } = req.user;
-    return res.status(200).json(userWithoutPassword);
+router.get('/validate',authenticateToken,(req, res) => {
+    return res.status(200).json({ valid: true, userId: req.userId });
 });
 
 router.get('/', (req, res) => {
