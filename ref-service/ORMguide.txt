@@ -1,0 +1,24 @@
+How to use
+Import any model from the index:
+
+const { Student, Teacher, Subject, ... } = require('../models');
+Examples:
+
+Find one: await Student.findOne({ uid: 123 });
+List: await Subject.findAll({ where: { id_level: 1 }, orderBy: 'name_subject ASC', limit: 20 });
+By ID: await Teacher.findById(5);
+Create: await Groupe.create({ code_groupe: 'G1', level_id: 2 });
+Update: await Departement.update(3, { name: 'New Name' });
+Delete: await Classroom.deleteById(10);
+This fulfills your “create a model to simulate ORM for each table” task. If you want, I can wire up simple relation helpers (e.g., Student -> Groupe/Level) next or add light validation for enum fields like type_subject and type_classroom.
+
+also we can make custom functions and distructure them like This
+const Custom_EditProfile = async ({key : value},userId)=>{
+...
+}
+module.exports = {
+    .
+    .
+    .
+  Custom_EditProfile,
+};
