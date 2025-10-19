@@ -1,22 +1,62 @@
+const { Level } = require('../models');
 
 const createLevel = async (req, res) => {
-    // Implementation for creating a departement
+    try{
+        const level = await Level.create(req.body);
+        res.status(201).json(level);
+    }catch(err){
+        res.status(400).json({ message: err.message });
+    }
 };
 
 const getLevelsBySpecId = async (req, res) => {
-    // Implementation for retrieving departements
+    try{
+        const { specId } = req.params;
+        const levels = await Level.find({ specialityId: specId });
+        res.status(200).json(levels);
+    }catch(err){
+        res.status(500).json({ message: err.message });
+    }
 };
 
 const getLevelById = async (req, res) => {
-    // Implementation for retrieving a departement by ID
+    try{
+        const { id } = req.params;
+        const level = await Level.findById(id);
+        if(!level){
+            return  res.status(404).json({ message: 'Level not found' });
+        }
+        res.status(200).json(level);
+    }catch(err){
+        res.status(500).json({ message: err.message });
+    }
 };
 
 const updateLevelById = async (req, res) => {
-    // Implementation for updating a departement
+    try{
+        const { id } = req.params;
+        const level = await Level.update(id, req.body);
+        if(!level){
+            return res.status(404).json({ message: 'Level not found' });
+        }
+        res.status(200).json(level);
+    
+    }catch(err){
+        res.status(400).json({ message: err.message });
+    }
 };
 
 const deleteLevelById = async (req, res) => {
-    // Implementation for deleting a departement
+    try{
+        const { id } = req.params;
+        const level = await Level.deleteById(id);
+        if(!level){
+            return res.status(404).json({ message: 'Level not found' });
+        }
+        res.status(200).json({ message: 'Level deleted successfully' });
+    }catch(err){
+        res.status(500).json({ message: err.message });
+    }
 };
 
 const LevelController = {
