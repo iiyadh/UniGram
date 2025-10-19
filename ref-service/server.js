@@ -15,7 +15,8 @@ app.use(cors({
 app.use(express.json());
 
 
-app.use("/api/ref", require("./routes/editprofileRoute"));
+app.use("/api/ref/editprofile", require("./routes/editprofileRoute"));
+// app.use("/api/ref/coreacademy", require("./routes/coreacademyRoute"));
 
 app.get("/", (req, res) => {
     res.send("Ref Service is running");
