@@ -12,7 +12,7 @@ const createSpeciality = async (req, res) => {
 const getSpecialitiesByDepId = async (req, res) => {
     try {
         const { depId } = req.params;
-        const specialities = await Speciality.findOne({ departmentId: depId });
+        const specialities = await Speciality.findAll({ departmentId: depId });
         res.status(200).json(specialities);
     } catch (error) {
         res.status(500).json({ message: error.message });
