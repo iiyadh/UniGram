@@ -12,7 +12,7 @@ const createLevel = async (req, res) => {
 const getLevelsBySpecId = async (req, res) => {
     try{
         const { specId } = req.params;
-        const levels = await Level.findAll({ specialityId: specId });
+        const levels = await Level.findAll({where : { specialityId: specId }});
         res.status(200).json(levels);
     }catch(err){
         res.status(500).json({ message: err.message });

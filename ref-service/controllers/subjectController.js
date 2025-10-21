@@ -12,7 +12,7 @@ const createSubject = async (req, res) => {
 const getSubjectsByLevelId = async (req, res) => {
     try{
         const { levelId } = req.params;
-        const subjects = await Subject.findAll({ levelId: levelId });
+        const subjects = await Subject.findAll({where : { levelId: levelId }});
         res.status(200).json(subjects);
     }catch(err){
         res.status(500).json({ message: err.message });
