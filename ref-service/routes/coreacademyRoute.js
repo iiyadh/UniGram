@@ -1,9 +1,11 @@
 const router = require('express').Router();
+const upload = require('../lib/multerConfig');
 
 const DepartementController = require('../controllers/departementController');
 const SpecialitiesController = require('../controllers/specialityController');
 const LevelController = require('../controllers/levelController');
 const SubjectController = require('../controllers/subjectController');
+const StudentController = require('../controllers/studentController');
 
 router.post('/departements', DepartementController.createDepartement);
 router.get('/departements', DepartementController.getDepartements);
@@ -33,6 +35,12 @@ router.get('/subjects/:id', SubjectController.getSubjectById);
 router.put('/subjects/:id', SubjectController.updateSubjectById);
 router.delete('/subjects/:id', SubjectController.deleteSubjectById);
 
+router.post('/students/upload', upload.single('file'),StudentController.uploadStudentsFromCSV );
+router.get('/students/download', StudentController.downloadStudentsAsCSV );
+router.post('/students', StudentController.createStudent);
+router.get('/students/:id', StudentController.getStudentById);
+router.put('/students/:id', StudentController.updateStudentById);
+router.delete('/students/:id', StudentController.deleteStudentById);
 
 
 

@@ -12,6 +12,19 @@ const Custom_EditProfile = async (key, value, userId) => {
   }
 };
 
+
+const Custom_CreateNewUser = async (cin , name , email , password , role) =>{
+  try{
+    const result = await db.query(
+      `INSERT INTO users (cin, name, email, password , role) VALUES ($1, $2, $3, $4 ,$5) RETURNING *`,
+      [cin , name , email , password , role]
+    );
+    return result.rows[0];
+  }catch( err ){
+    console.error("Error in Custom_CreateNewUser:", err);
+  }
+}
+
 module.exports = {
   Teacher: require('./Teacher'),
   Chef: require('./Chef'),
@@ -24,4 +37,5 @@ module.exports = {
   TeacherSubject: require('./TeacherSubject'),
   Classroom: require('./Classroom'),
   Custom_EditProfile,
+  Custom_CreateNewUser,
 };
