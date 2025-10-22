@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=BBH+Sans+Hegarty&family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Orbitron:wght@400..900&display=swap');
+
+.login-container{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f2f5;
+
+    .login-wrapper{
+        display: flex;
+        min-width: 700px;
+        min-height:600px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+    .login-presentation{
+        color: black;
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap:20px;
+        background-color: #e6f7ff;
+        font-family: "Chakra Petch", sans-serif;
+        font-weight: 700;
+        font-style: normal;
+
+
+        h1{
+            font-size: 36px;
+            margin-bottom: 10px;
+            color:#111;
+        }
+        p{
+            font-size: 18px;
+            text-align: center;
+            max-width: 400px;
+            color:#333;
+        }
+    }
+    .login-card{
+        width: 500px;
+        margin: 0 auto;
+        padding: 40px 32px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        background: #ffffff;
+        transition: box-shadow 0.3s ease;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        font-family: "Chakra Petch", sans-serif;
+        font-style: normal;
+
+        .signbutton{
+            margin-top:12px;
+            width: 100%;
+            height: 40px;
+            font-size: 16px;
+            background-color: #1890ff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bolder;
+
+            &:hover {
+                background-color: #40a9ff;
+            }
+        }
+
+        input[type='text'] , input[type='password'] {
+            height: 40px;
+            width: 300px;
+            font-size: 16px;
+            padding: 8px 12px;
+            transition: border-color 0.3s ease;
+        }
+
+
+        h2{
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+    }
+}
+
+
+
+
+

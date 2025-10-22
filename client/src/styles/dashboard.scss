@@ -1,0 +1,25 @@
+.dashboard{
+    background-color: #f0f2f5;
+    display: flex;
+    flex-direction: column;
+
+
+    .dashboard-table{
+        width: 80%;
+        margin:auto;
+        transform: translateY(-50%);
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+
+        .ant-table-thead > tr > th {
+            background-color: #fafafa;
+            font-weight: 600;
+        }
+
+        .ant-table-tbody > tr > td {
+            font-size: 14px;
+        }
+    }
+}
