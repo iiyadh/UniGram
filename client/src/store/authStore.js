@@ -1,4 +1,4 @@
-import api from '../api/api';
+import api from '../api/interceptor';
 import { create } from 'zustand';
 
 export const useAuthStore = create((set) => ({
@@ -7,7 +7,7 @@ export const useAuthStore = create((set) => ({
     
     login: async (data)=>{
         try{
-            const res = await api.post('/auth/login', data);
+            const res = await api.post('/auth/api/auth/login', data);
             set({ token: res.data.token });
             return { success: true, data: res.data };
         }catch(err){
@@ -21,7 +21,7 @@ export const useAuthStore = create((set) => ({
     logout: async () => {
         set({ token: null });
         try{
-            const res = await api.post('/auth/logout');
+            const res = await api.post('/auth/api/auth/logout');
             return { success: true, data: res.data };
         }catch(err){
             return {
@@ -30,4 +30,9 @@ export const useAuthStore = create((set) => ({
             };
         }
     },
+
+    isAuthenticated: () =>{
+        return !!useAuthStore.getState().token;
+    }
+    
 }));

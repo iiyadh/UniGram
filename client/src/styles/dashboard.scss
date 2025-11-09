@@ -5,7 +5,6 @@
 
 
     .dashboard-table{
-        width: 80%;
         margin:auto;
         transform: translateY(-50%);
         background-color: #fff;
@@ -20,6 +19,31 @@
 
         .ant-table-tbody > tr > td {
             font-size: 14px;
+        }
+
+        th , td {
+            padding: 15px 100px !important;
+        }
+
+        .delete-btn::before , .edit-btn::before {
+            opacity: 0%;
+            content: "Delete";
+            color: black;
+            background-color: #fff;
+            border: 1px solid black;
+            border-radius: 4px;
+            padding: 2px 3px;
+            position: absolute;
+            top: -20px;
+            right: -30px;
+            font-size: 9pt;
+        }
+        .edit-btn::before{
+            content: "Edit";
+            right: -20px;
+        }
+        .delete-btn:hover::before , .edit-btn:hover::before {
+            opacity: 100%;
         }
     }
 }

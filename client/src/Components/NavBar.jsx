@@ -4,7 +4,9 @@ import { MoonOutlined,SunOutlined,BellOutlined,LogoutOutlined
     ,UserOutlined 
     ,ProjectOutlined} from '@ant-design/icons';
 import { useState } from 'react';
+import { useAuthStore } from '../store/authStore';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../styles/generalstyle.scss';
 
 
@@ -12,7 +14,28 @@ import '../styles/generalstyle.scss';
 
 const NavBar = () => {
 
+    const navigate = useNavigate(); 
+
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const { logout } = useAuthStore();
+
+    const handleLogout = async () => {
+        
+        try{
+            const res = await logout();
+            if(res.success){
+                console.log("Logout successful:", res.data);
+                navigate('/login');
+                
+            }else{
+                console.log("Logout failed:", res.error);
+            }
+        }catch(err){
+            console.log(err);
+        }finally{
+            navigate('/login');
+        }
+    }
 
     return (
         <div style={{
@@ -54,7 +77,8 @@ const NavBar = () => {
                     background: '#016FB9',
                     borderColor: '#016FB9',
                     marginRight: '10px'
-                }}>
+                }}
+                onClick={handleLogout}>
                     <LogoutOutlined style={{ marginRight: 8 }} />
                     Logout
                 </Button>

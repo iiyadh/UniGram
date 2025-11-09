@@ -4,6 +4,7 @@ import LogoLight from '../assets/LogoLight.png';
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph } = Typography;
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -31,13 +32,15 @@ const LandingPage = () => {
                     >
                         {isDarkMode ? "Dark" : "Light"}
                     </Button>
-                    <Button type="primary" style={{ 
-                        background: '#016FB9', 
-                        borderColor: '#016FB9',
-                        marginRight: '10px'
-                    }}>
-                        Login
-                    </Button>
+                    <Link to='/login'>
+                        <Button type="primary" style={{ 
+                            background: '#016FB9', 
+                            borderColor: '#016FB9',
+                            marginRight: '10px'
+                        }}>
+                            Login
+                        </Button>
+                    </Link>
                 </div>
             </Header>
 
@@ -51,16 +54,18 @@ const LandingPage = () => {
                         <Paragraph style={{ color: '#182825', fontSize: '20px', marginBottom: '40px' }}>
                             Streamline your academic journey with our comprehensive management platform
                         </Paragraph>
-                        <Button size="large" type="primary" style={{ 
-                            background: '#016FB9', 
-                            borderColor: '#016FB9',
-                            height: '50px',
-                            fontSize: '18px',
-                            paddingLeft: '40px',
-                            paddingRight: '40px'
-                        }}>
-                            Get Started
-                        </Button>
+                        <Link to='/login'>
+                            <Button size="large" type="primary" style={{ 
+                                background: '#016FB9', 
+                                borderColor: '#016FB9',
+                                height: '50px',
+                                fontSize: '18px',
+                                paddingLeft: '40px',
+                                paddingRight: '40px'
+                            }}>
+                                Get Started
+                            </Button>
+                        </Link>
                     </Col>
                 </Row>
 

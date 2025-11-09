@@ -24,80 +24,95 @@ const forgotPassword = async (req,res) =>{
             subject: 'Password Reset - Unigram',
             text: `You requested a password reset. Click here to reset your password: ${resetLink}`,
             html: `
-            <div style="
-            font-family: 'Segoe UI', Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #FFFFFF;
-            border-radius: 12px;
-            border-top: 5px solid #6B46C1;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            ">
-            <div style="text-align: center;">
-            <img src="https://i.postimg.cc/XJGBgHfM/Logo-removebg-preview.png" alt="Unigram Logo" style="width:80%;margin:0 auto;display:block;"/>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+            <style>
+            body {
+                font-family: 'Chakra Petch', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f9fafc;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #FFFFFF;
+                border-radius: 12px;
+                border-top: 5px solid #0514ebd7;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                text-align: center;
+            }
+            h1 {
+                color: #1A365D;
+                font-size: 28px;
+                margin-bottom: 25px;
+                font-weight: 600;
+            }
+            p {
+                color: #2D3748;
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }
+            a.button {
+                background-color: #0514ebd7;
+                color: white;
+                padding: 14px 30px;
+                text-decoration: none;
+                border-radius: 6px;
+                font-weight: bold;
+                display: inline-block;
+                transition: background-color 0.3s;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            a.button:hover {
+                background-color: #0210b5;
+            }
+            .footer {
+                color: #4A5568;
+                font-size: 14px;
+                line-height: 1.5;
+                margin-top: 25px;
+                border-top: 1px solid #E2E8F0;
+                padding-top: 20px;
+            }
+            .footer a {
+                color: #0514ebd7;
+                text-decoration: none;
+            }
+            img.logo {
+                width: 80%;
+                margin: 0 auto 20px;
+                display: block;
+            }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+            <img src="https://i.postimg.cc/jS2YHCRf/Logo-Light.png" alt="Unigram Logo" class="logo" />
+            <h1>Password Reset</h1>
+            <p>A password reset was requested for your Unigram account.</p>
+            <p>To set a new password, please click the button below:</p>
+            <div style="margin: 35px 0;">
+                <a href="${resetLink}" class="button">Reset Password</a>
             </div>
-            <h1 style="
-            color: #1A365D;
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 28px;
-            ">
-            Password Reset
-            </h1>
-
-            <p style="
-            color: #2D3748;
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            text-align: center;
-            ">
-            A password reset was requested for your Unigram account.
-            </p>
-
-            <p style="
-            color: #2D3748;
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            text-align: center;
-            ">
-            To set a new password, please click the button below:
-            </p>
-
-            <div style="text-align: center; margin: 35px 0;">
-            <a href="${resetLink}" style="
-            background-color: #6B46C1;
-            color: white;
-            padding: 14px 30px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            display: inline-block;
-            transition: background-color 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            ">
-            Reset Password
-            </a>
+            <div class="footer">
+                If you didn't request this password reset, please ignore this email or 
+                <a href="mailto:support@unigram.com">contact our support team</a>.
             </div>
-
-            <p style="
-            color: #4A5568;
-            font-size: 14px;
-            line-height: 1.5;
-            margin-top: 25px;
-            border-top: 1px solid #E2E8F0;
-            padding-top: 20px;
-            text-align: center;
-            ">
-            If you didn't request this password reset, please ignore this email or 
-            <a href="mailto:support@unigram.com" style="color: #6B46C1; text-decoration: none;">contact our support team</a>.
-            </p>
             </div>
-            `,
+        </body>
+        </html>
+        `,
         };
+
         await sendEmail(mailOptions);
         res.status(200).json({ message: 'Password reset link sent to your email' });
     }catch(err){

@@ -2,8 +2,25 @@ import { Form, Input, Button, Card, Image } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import LogoLight from '../../assets/LogoLight.png';
 import '../../styles/auth.scss';
+import { Link } from "react-router-dom";
+import api from "../../api/interceptor"
 
 const ForgotPasswordPage = () => {
+
+    const [form] = Form.useForm();
+
+    const handleSubmit = async (values) => {
+        try {
+            const res = await api.post('auth/api/password/forgot', values);
+            if (res.data.success) {
+                console.log("Reset link sent:", res.data.message);
+            } else {
+                console.log("Failed to send reset link:", res.data.message);
+            }
+        }catch(err){
+            console.log(err);
+        }
+    };
     return (
         <div className="login-container">
             <div className="login-wrapper">
@@ -14,7 +31,8 @@ const ForgotPasswordPage = () => {
                 </div>
                 <Card className="login-card">
                     <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Forgot Password</h2>
-                    <Form layout="vertical">
+                    <Form layout="vertical"
+                        form={form} onFinish={handleSubmit} initialValues={{ email: "" }}>
                         <Form.Item
                             name="email"
                             label="Email"
@@ -28,9 +46,9 @@ const ForgotPasswordPage = () => {
                             </Button>
                         </Form.Item>
                         <Form.Item>
-                            <a href="/login" style={{ float: 'right' }}>
+                            <Link to="/login" style={{ float: 'right' }}>
                                 Back to Login
-                            </a>
+                            </Link>
                         </Form.Item>
                     </Form>
                 </Card>

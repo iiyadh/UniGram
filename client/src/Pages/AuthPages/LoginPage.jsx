@@ -1,10 +1,32 @@
-import { Form, Input, Button, Card , Image } from "antd"
-import { LockOutlined, UserOutlined } from "@ant-design/icons"
-import LogoLight from '../../assets/LogoLight.png'
-import '../../styles/auth.scss'
+import { Form, Input, Button, Card , Image } from "antd";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import LogoLight from '../../assets/LogoLight.png';
+import '../../styles/auth.scss';
+import { Link } from "react-router-dom";
+import { useAuthStore } from "../../store/authStore";
+import { useNavigate } from "react-router-dom";
 
 
 const LoginPage = () => {
+
+    const [form] = Form.useForm();
+    const { login } = useAuthStore();
+    const navigate = useNavigate();
+
+    const handleSubmit = async (values) => {
+        try{
+            const res = await login(values);
+            if(res.success){
+                console.log("Login successful:", res.data);
+                navigate('/dashboard');
+            }else{
+                console.log("Login failed:", res.error);
+            }
+        }catch(err){
+            console.log(err);
+        }
+    }
+
     return (
         <div className="login-container">
             <div className="login-wrapper">
@@ -15,13 +37,13 @@ const LoginPage = () => {
                 </div>
                 <Card className="login-card">
                     <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Login</h2>
-                    <Form layout="vertical">
+                    <Form layout="vertical" form={form} onFinish={handleSubmit} initialValues={{ cin: "", password: "" }}>
                         <Form.Item
-                            name="email"
-                            label="Email"
-                            rules={[{ required: true, message: 'Please input your email!' }]}
+                            name="cin"
+                            label="CIN"
+                            rules={[{ required: true, message: 'Please input your Cin!' }]}
                         >
-                            <Input prefix={<UserOutlined />} placeholder="Email" />
+                            <Input prefix={<UserOutlined />} placeholder="********" />
                         </Form.Item>
                         <Form.Item
                             name="password"
@@ -36,9 +58,9 @@ const LoginPage = () => {
                             </Button>
                         </Form.Item>
                         <Form.Item>
-                            <a href="/forgot-password" style={{ float: 'right' }}>
+                            <Link to="/forget-password" style={{ float: 'right' }}>
                                 Forgot password?
-                            </a>
+                            </Link>
                         </Form.Item>
                     </Form>
                 </Card>
