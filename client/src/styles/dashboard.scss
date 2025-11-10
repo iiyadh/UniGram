@@ -1,49 +1,473 @@
-.dashboard{
-    background-color: #f0f2f5;
-    display: flex;
-    flex-direction: column;
+// Specialty Table
+.specialty-card,
+.levels-card,
+.groups-card,
+.subjects-card,
+.classrooms-card {
+  margin: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 
-
-    .dashboard-table{
-        margin:auto;
-        transform: translateY(-50%);
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-
-        .ant-table-thead > tr > th {
-            background-color: #fafafa;
-            font-weight: 600;
-        }
-
-        .ant-table-tbody > tr > td {
-            font-size: 14px;
-        }
-
-        th , td {
-            padding: 15px 100px !important;
-        }
-
-        .delete-btn::before , .edit-btn::before {
-            opacity: 0%;
-            content: "Delete";
-            color: black;
-            background-color: #fff;
-            border: 1px solid black;
-            border-radius: 4px;
-            padding: 2px 3px;
-            position: absolute;
-            top: -20px;
-            right: -30px;
-            font-size: 9pt;
-        }
-        .edit-btn::before{
-            content: "Edit";
-            right: -20px;
-        }
-        .delete-btn:hover::before , .edit-btn:hover::before {
-            opacity: 100%;
-        }
+  .ant-card-head {
+    border-bottom: 1px solid #f0f0f0;
+    
+    .ant-card-head-title {
+      font-weight: 600;
+      color: #262626;
+      font-size: 18px;
     }
+  }
+
+  .total-count {
+    color: #8c8c8c;
+    font-size: 14px;
+    font-weight: normal;
+  }
+}
+
+// Specialty Table Specific
+.specialty-table {
+  .specialty-code {
+    font-family: monospace;
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .specialty-name {
+    font-weight: 500;
+    color: #1890ff;
+  }
+  
+  .department-id {
+    color: #52c41a;
+    font-weight: 500;
+  }
+}
+
+// Levels Table Specific
+.levels-table {
+  .level-number {
+    font-weight: 600;
+    color: #722ed1;
+  }
+  
+  .specialty-name {
+    color: #fa8c16;
+    font-weight: 500;
+  }
+}
+
+// Groups Table Specific
+.groups-table {
+  .group-code {
+    font-family: monospace;
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .level-info {
+    color: #1890ff;
+    font-weight: 500;
+  }
+}
+
+// Subjects Table Specific
+.subjects-table {
+  .subject-type {
+    border-radius: 12px;
+    font-weight: 500;
+    border: none;
+  }
+  
+  .subject-name {
+    font-weight: 500;
+    color: #262626;
+  }
+  
+  .level-info {
+    color: #52c41a;
+    font-weight: 500;
+  }
+  
+  .credits,
+  .coefficient {
+    font-weight: 600;
+    color: #1890ff;
+  }
+}
+
+// Classrooms Table Specific
+.classrooms-table {
+  .classroom-code {
+    font-family: monospace;
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .capacity {
+    font-weight: 600;
+    color: #fa8c16;
+  }
+  
+  .classroom-type {
+    border-radius: 12px;
+    font-weight: 500;
+    border: none;
+  }
+  
+  .department-name {
+    color: #722ed1;
+    font-weight: 500;
+  }
+}
+
+// Common Table Styles for all components
+.specialty-table,
+.levels-table,
+.groups-table,
+.subjects-table,
+.classrooms-table {
+  .ant-table {
+    border-radius: 8px;
+    overflow: hidden;
+    
+    .ant-table-thead > tr > th {
+      background: #fafafa;
+      font-weight: 600;
+      color: #262626;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .ant-table-tbody > tr {
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: #f5f5f5;
+        
+        .edit-btn,
+        .delete-btn {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .edit-input,
+  .edit-select {
+    border-radius: 4px;
+  }
+
+  .action-buttons {
+    .save-btn {
+      background: #52c41a;
+      border-color: #52c41a;
+      border-radius: 4px;
+      
+      &:hover {
+        background: #73d13d;
+        border-color: #73d13d;
+      }
+    }
+    
+    .cancel-btn {
+      border-radius: 4px;
+    }
+    
+    .edit-btn {
+      color: #1890ff;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        opacity: 1;
+        color: #40a9ff;
+        background: rgba(24, 144, 255, 0.1);
+      }
+    }
+
+    .delete-btn {
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        opacity: 1;
+        background: rgba(255, 77, 79, 0.1);
+      }
+    }
+  }
+}
+
+// Table Toolbar (Common for all)
+.table-toolbar {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+
+  .toolbar-actions {
+    width: 100%;
+  }
+
+  .add-input,
+  .add-select {
+    border-radius: 6px;
+    
+    &:focus {
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+  }
+
+  .add-btn {
+    border-radius: 6px;
+    font-weight: 500;
+    
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .specialty-card,
+  .levels-card,
+  .groups-card,
+  .subjects-card,
+  .classrooms-card {
+    margin: 8px;
+    
+    .ant-card-head-title {
+      font-size: 16px;
+    }
+  }
+
+  .table-toolbar {
+    padding: 12px;
+    
+    .toolbar-actions {
+      flex-direction: column;
+      align-items: stretch;
+      
+      .add-input,
+      .add-select,
+      .add-btn {
+        width: 100%;
+        margin-bottom: 8px;
+      }
+    }
+  }
+
+  .specialty-table,
+  .levels-table,
+  .groups-table,
+  .subjects-table,
+  .classrooms-table {
+    .ant-table {
+      font-size: 12px;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      
+      .ant-btn {
+        margin-bottom: 4px;
+      }
+    }
+  }
+}
+
+// Sidebar Styles
+.ant-layout-sider {
+  &.ant-layout-sider-light {
+    .ant-menu {
+      &.ant-menu-light {
+        .ant-menu-item {
+          margin: 4px 8px;
+          border-radius: 6px;
+          height: 40px;
+          line-height: 40px;
+          
+          &:hover {
+            background: rgba(24, 144, 255, 0.1);
+            color: #1890ff;
+            
+            .anticon {
+              color: #1890ff;
+            }
+          }
+          
+          &.ant-menu-item-selected {
+            background: #1890ff;
+            color: white;
+            font-weight: 500;
+            
+            .anticon {
+              color: white;
+            }
+            
+            &::after {
+              display: none;
+            }
+          }
+        }
+        
+        .ant-menu-submenu {
+          margin: 4px 8px;
+          border-radius: 6px;
+          
+          .ant-menu-submenu-title {
+            border-radius: 6px;
+            height: 40px;
+            line-height: 40px;
+            
+            &:hover {
+              background: rgba(24, 144, 255, 0.1);
+              color: #1890ff;
+              
+              .anticon {
+                color: #1890ff;
+              }
+            }
+          }
+          
+          &.ant-menu-submenu-selected {
+            .ant-menu-submenu-title {
+              background: #1890ff;
+              color: white;
+              font-weight: 500;
+              
+              .anticon {
+                color: white;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Main content adjustment for collapsed sidebar
+.ant-layout-sider-collapsed + .main-content {
+  margin-left: 80px !important;
+}
+
+// Responsive sidebar
+@media (max-width: 991px) {
+  .ant-layout-sider {
+    position: fixed !important;
+    z-index: 1000;
+    
+    &.ant-layout-sider-collapsed {
+      transform: translateX(-100%);
+    }
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+// Dashboard layout adjustments
+.dashboard {
+  position: relative;
+  
+  .main-content {
+    padding-top: 80px; // Account for navbar height
+  }
+}
+
+// Navbar styles (add if needed)
+.navbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 250px;
+  z-index: 999;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #f0f0f0;
+  transition: left 0.2s;
+  
+  .ant-layout-sider-collapsed + & {
+    left: 80px;
+  }
+}
+
+// Card content spacing adjustment
+.specialty-card,
+.levels-card,
+.groups-card,
+.subjects-card,
+.classrooms-card,
+.department-card,
+.students-card {
+  margin: 0 0 24px 0;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px !important;
+    padding-top: 80px !important;
+  }
+  
+  .navbar {
+    left: 0;
+    
+    .ant-layout-sider-collapsed + & {
+      left: 0;
+    }
+  }
+  
+  .ant-layout-sider {
+    &:not(.ant-layout-sider-collapsed) {
+      & ~ .main-content {
+        margin-left: 0 !important;
+      }
+    }
+  }
+}
+
+// Smooth transitions
+.ant-layout-sider,
+.main-content,
+.navbar {
+  transition: all 0.2s ease;
+}
+
+// Scrollbar styling for sidebar
+.ant-layout-sider {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
 }

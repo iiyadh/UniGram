@@ -44,8 +44,10 @@ const NavBar = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottom: '2px solid #016FB9'
-        }}>
+            borderBottom: '2px solid #016FB9',
+            marginLeft: '39px',
+        }}
+        >
             <div className='logo' style={{ color: '#000', fontSize: '24px', fontWeight: 'bold' }}>
                 <Image src={LogoLight} alt="UniCord Logo" style={{ height: '40px', marginRight: '10px' }} preview={false} />
                 UniCord

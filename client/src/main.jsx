@@ -14,6 +14,12 @@ import ResetPasswordPage from './Pages/AuthPages/ResetPasswordPage.jsx';
 import MainContent from './Pages/Dashboard/MainContent.jsx';
 import DepartementTable from './Components/DepartementTable.jsx';
 import AuthProtection from './Protection/AuthProtection.jsx';
+import StudentsTable from './Components/StudentsTable.jsx';
+import ClassroomsTable from './Components/ClassroomsTable.jsx';
+import GroupesTable from './Components/GroupesTable.jsx';
+import LevelsTable from './Components/LevelsTable.jsx';
+import SpecialtyTable from './Components/SpecialtyTable.jsx';
+import SubjectsTable from './Components/SubjectsTable.jsx';
 
 const router = createBrowserRouter([
     {
@@ -25,10 +31,16 @@ const router = createBrowserRouter([
             { path: 'forget-password' , element: <ForgetPasswordPage /> },
             { path: 'reset-password/:token' , element: <ResetPasswordPage /> },
             { path: '*' , element: <NotFound /> },
-            { path: 'dashboard', element: <AuthProtection><MainContent /></AuthProtection>, 
+            { path: 'dashboard', element: <MainContent />, 
                 children : [
-                    { index: true, element: <Navigate to="dep" /> },
+                    { index: true, element: <Navigate to="dep" replace /> },
                     { path: 'dep', element: <DepartementTable />},
+                    { path : 'students', element: <StudentsTable />},
+                    { path : 'classrooms', element: <ClassroomsTable />},
+                    { path : 'groupes', element: <GroupesTable />},
+                    { path : 'levels', element: <LevelsTable />},
+                    { path : 'specialties', element: <SpecialtyTable />},
+                    { path : 'subjects', element: <SubjectsTable />},
                 ]
             }
         ]
