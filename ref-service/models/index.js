@@ -25,17 +25,25 @@ const Custom_CreateNewUser = async (cin , name , email , password , role) =>{
   }
 }
 
+const listDepartements = async () =>{
+    try{
+        const result = await pool.query(
+            `SELECT D.id , D.name FROM departements D`
+        );
+        return result.rows;
+    }catch(err){
+        console.log("Error in listDepartements:", err);
+    }
+};
+
 module.exports = {
-  Teacher: require('./Teacher'),
-  Chef: require('./Chef'),
-  Departement: require('./Departement'),
-  Speciality: require('./Speciality'),
-  Level: require('./Level'),
-  Groupe: require('./Groupe'),
-  Student: require('./Student'),
-  Subject: require('./Subject'),
-  TeacherSubject: require('./TeacherSubject'),
-  Classroom: require('./Classroom'),
   Custom_EditProfile,
   Custom_CreateNewUser,
+  listDepartements,
+  Departement : require("./DepCustom"),
+  Speciality : require("./SpecCustom"),
+  Level : require("./LevelCustom"),
+  Classroom : require("./ClassroomCustom"),
+  Group : require("./GroupCustom"),
+  Subject : require("./SubjectCustom"),
 };

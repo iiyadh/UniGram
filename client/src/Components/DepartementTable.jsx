@@ -1,70 +1,126 @@
-import { useState } from "react"
-import { Table, Input, Button, Popconfirm, message, Space, Card } from "antd"
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import '../styles/dashboard.scss'
+import { useState, useEffect } from "react";
+import { 
+  Table, Input, Button, Popconfirm, message, Space, Card, Dropdown  ,Select 
+} from "antd";
+import { 
+  DeleteOutlined, EditOutlined, PlusOutlined, MoreOutlined ,ApartmentOutlined, BookOutlined
+} from "@ant-design/icons";
+import { useAcademyStore } from "../store/academyStore";
+import "../styles/dashboard.scss";
+import api from "../api/interceptor";
+import { useNavigate } from "react-router-dom";
 
 const DepartementTable = () => {
-  const [data, setData] = useState([
-    { id: 1, name: "Informatique", chef_id: "C001" },
-    { id: 2, name: "Mathématiques", chef_id: "C002" },
-  ])
+  const {
+    departments,
+    fetchDepartments,
+    createDepartment,
+    updateDepartment,
+    deleteDepartment,
+  } = useAcademyStore();
 
-  const [editId, setEditId] = useState(null)
-  const [editRow, setEditRow] = useState({})
-  const [newDept, setNewDept] = useState({ name: "", chef_id: "" })
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
+
+  const [editId, setEditId] = useState(null);
+  const [editRow, setEditRow] = useState({});
+  const [newDept, setNewDept] = useState({ name: "" });
+  const [teachers, setTeachers] = useState([]);
+
+  useEffect(() => {
+    loadDepartments();
+    fetchTeachers();
+  }, []);
+
+  const fetchTeachers = async () => {
+    try {
+      const res = await api.get('ref/api/ref/coreacademy/departments/teachers');
+      console.log(res.data.data);
+      setTeachers(res.data.data);
+    } catch (err) {
+      console.error("Error fetching teachers:", err);
+    }
+  };
+
+  const loadDepartments = async () => {
+    setLoading(true);
+    const result = await fetchDepartments();
+    if (!result.success) message.error(result.error);
+    setLoading(false);
+  };
 
   const handleEdit = (row) => {
-    setEditId(row.id)
-    setEditRow({ ...row })
-  }
+    setEditId(row.id);
+    setEditRow({ ...row });
+  };
 
-  const handleSave = () => {
-    if (!editRow.name?.trim() || !editRow.chef_id?.trim()) {
-      message.warning("Both Name and Chef ID are required")
-      return
+  const handleSave = async () => {
+    if (!editRow.name?.trim()) {
+      message.warning("Name must be selected");
+      return;
     }
-    setData(prev => prev.map(item => 
-      item.id === editId ? { 
-        ...editRow, 
-        name: editRow.name.trim(), 
-        chef_id: editRow.chef_id.trim() 
-      } : item
-    ))
-    setEditId(null)
-    setEditRow({})
-    message.success("Department updated successfully")
-  }
+
+    setLoading(true);
+    const result = await updateDepartment(editId, {
+      name: editRow.name.trim(),
+      chef_id: editRow.chef_id,
+    });
+
+    if (result.success) {
+      setEditId(null);
+      setEditRow({});
+      message.success("Department updated successfully");
+      loadDepartments();
+    } else {
+      message.error(result.error);
+    }
+
+    setLoading(false);
+  };
 
   const handleCancel = () => {
-    setEditId(null)
-    setEditRow({})
-  }
+    setEditId(null);
+    setEditRow({});
+  };
 
-  const handleDelete = (id) => {
-    setData(prev => prev.filter(item => item.id !== id))
-    message.success("Department deleted successfully")
-  }
-
-  const handleAdd = () => {
-    const name = newDept.name.trim()
-    const chefId = newDept.chef_id.trim()
-    if (!name || !chefId) {
-      message.warning("Please fill out both Name and Chef ID")
-      return
+  const handleDelete = async (id) => {
+    setLoading(true);
+    const result = await deleteDepartment(id);
+    if (result.success) {
+      message.success("Department deleted successfully");
+    } else {
+      message.error(result.error);
     }
-    const nextId = data.length ? Math.max(...data.map(d => d.id)) + 1 : 1
-    setData(prev => [...prev, { id: nextId, name, chef_id: chefId }])
-    setNewDept({ name: "", chef_id: "" })
-    message.success("Department added successfully")
-  }
+    setLoading(false);
+  };
+
+  const handleAdd = async () => {
+    const name = newDept.name.trim();
+
+    if (!name) {
+      message.warning("Please fill out both Name and Chef ID");
+      return;
+    }
+
+    setLoading(true);
+    const result = await createDepartment({ name});
+    if (result.success) {
+      setNewDept({ name: ""});
+      message.success("Department added successfully");
+    } else {
+      message.error(result.error);
+    }
+    setLoading(false);
+  };
 
   const columns = [
-    { 
-      title: "ID", 
-      dataIndex: "id", 
-      key: "id", 
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
       width: 80,
-      align: 'center'
+      align: "center",
     },
     {
       title: "Name",
@@ -74,50 +130,57 @@ const DepartementTable = () => {
         editId === record.id ? (
           <Input
             value={editRow.name}
-            onChange={(e) => setEditRow({ ...editRow, name: e.target.value })}
-            placeholder="Department name"
+            onChange={(e) =>
+              setEditRow({ ...editRow, name: e.target.value })
+            }
             size="small"
+            placeholder="Department name"
           />
         ) : (
           <span className="department-name">{record.name}</span>
         ),
     },
     {
-      title: "Chef ID",
+      title: "Chef",
       dataIndex: "chef_id",
       key: "chef_id",
-      width: 120,
+      width: 180,
       render: (_, record) =>
         editId === record.id ? (
-          <Input
+          <Select
             value={editRow.chef_id}
-            onChange={(e) => setEditRow({ ...editRow, chef_id: e.target.value })}
-            placeholder="Chef ID"
-            size="small"
+            onChange={(value) => setEditRow({ ...editRow, chef_id: value })}
+            placeholder="Select a teacher"
+            style={{ width: "100%" }}
+            allowClear
+            options={[
+              { label: "None", value: null },
+              ...teachers.map((teacher) => ({
+                label: teacher.name,
+                value: teacher.id,
+              }))
+            ]}
           />
         ) : (
-          <span className="chef-id">{record.chef_id}</span>
+          <span className="chef-id">
+            {teachers.find((t) => t.id === record.uid)?.name || (
+              <p className="none-tag">None</p>
+            )}
+          </span>
         ),
     },
     {
       title: "Actions",
       key: "actions",
       width: 120,
-      align: 'center',
+      align: "center",
       render: (_, record) =>
         editId === record.id ? (
           <Space size="small">
-            <Button 
-              type="primary" 
-              onClick={handleSave} 
-              size="small"
-            >
+            <Button type="primary" onClick={handleSave} size="small">
               Save
             </Button>
-            <Button 
-              onClick={handleCancel}
-              size="small"
-            >
+            <Button onClick={handleCancel} size="small">
               Cancel
             </Button>
           </Space>
@@ -125,64 +188,84 @@ const DepartementTable = () => {
           <Space size="small">
             <Button
               type="link"
-              onClick={() => handleEdit(record)}
-              icon={<EditOutlined />}
-              className="edit-btn"
               size="small"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
             />
+
             <Popconfirm
               title="Delete this department?"
-              description="Are you sure you want to delete this department?"
+              onConfirm={() => handleDelete(record.id)}
               okText="Yes"
               cancelText="No"
-              onConfirm={() => handleDelete(record.id)}
               okType="danger"
             >
-              <Button 
-                type="link" 
-                danger 
-                icon={<DeleteOutlined />}
-                className="delete-btn"
+              <Button
+                type="link"
+                danger
                 size="small"
+                icon={<DeleteOutlined />}
               />
             </Popconfirm>
+
+            <Dropdown
+              trigger={["click"]}
+              placement="bottomRight"
+              menu={{
+                items: [
+                  { 
+                    key: "manage-classroom", 
+                    label: "Manage classroom",
+                    icon: <ApartmentOutlined />
+                  },
+                  { 
+                    key: "manage-specialites", 
+                    label: "Manage specialites",
+                    icon : <BookOutlined />
+                   },
+                ],
+                onClick: ({ key }) => {
+                  if (key === "manage-classroom") {
+                    navigate(`/dashboard/classrooms/${record.id}`);
+                  }else{
+                    navigate(`/dashboard/specialties/${record.id}`);
+                  }
+                },
+              }}
+            >
+              <Button
+                type="text"
+                size="small"
+                icon={<MoreOutlined style={{ rotate: "90deg" }} />}
+              />
+            </Dropdown>
           </Space>
         ),
     },
-  ]
+  ];
 
   return (
-    <Card 
-      title="Departments Management" 
+    <Card
+      title="Departments Management"
       className="department-card"
-      extra={
-        <span className="total-count">{data.length} departments</span>
-      }
+      extra={<span>{departments.length} departments</span>}
     >
       <div className="table-toolbar">
-        <Space wrap size="middle" className="toolbar-actions">
+        <Space wrap size="middle">
           <Input
             placeholder="Department Name"
             value={newDept.name}
-            onChange={(e) => setNewDept({ ...newDept, name: e.target.value })}
+            onChange={(e) =>
+              setNewDept({ ...newDept, name: e.target.value })
+            }
             style={{ width: 200 }}
             allowClear
-            onPressEnter={handleAdd}
           />
-          <Input
-            placeholder="Chef ID"
-            value={newDept.chef_id}
-            onChange={(e) => setNewDept({ ...newDept, chef_id: e.target.value })}
-            style={{ width: 150 }}
-            allowClear
-            onPressEnter={handleAdd}
-          />
-          <Button 
-            type="primary" 
-            onClick={handleAdd} 
-            disabled={!!editId}
+          <Button
+            type="primary"
             icon={<PlusOutlined />}
-            className="add-btn"
+            onClick={handleAdd}
+            disabled={!!editId}
           >
             Add Department
           </Button>
@@ -190,22 +273,20 @@ const DepartementTable = () => {
       </div>
 
       <Table
-        dataSource={data}
+        dataSource={departments}
         columns={columns}
         rowKey="id"
-        className="department-table"
+        loading={loading}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => 
-            `${range[0]}-${range[1]} of ${total} items`
         }}
         size="middle"
         scroll={{ x: 600 }}
       />
     </Card>
-  )
-}
+  );
+};
 
-export default DepartementTable
+export default DepartementTable;

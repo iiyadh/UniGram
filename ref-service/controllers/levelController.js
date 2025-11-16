@@ -1,70 +1,95 @@
-const { Level } = require('../models');
+const LevelModel = require("../models/LevelCustom");
 
 const createLevel = async (req, res) => {
-    try{
-        const level = await Level.create(req.body);
-        res.status(201).json(level);
-    }catch(err){
-        res.status(400).json({ message: err.message });
-    }
-};
-
-const getLevelsBySpecId = async (req, res) => {
-    try{
-        const { specId } = req.params;
-        const levels = await Level.findAll({where : { specialityId: specId }});
-        res.status(200).json(levels);
-    }catch(err){
-        res.status(500).json({ message: err.message });
-    }
-};
-
-const getLevelById = async (req, res) => {
-    try{
-        const { id } = req.params;
-        const level = await Level.findById(id);
-        if(!level){
-            return  res.status(404).json({ message: 'Level not found' });
+    try {
+        const { num_level, speciality_id } = req.body;
+        
+        if (!num_level || !speciality_id) {
+            return res.status(400).json({
+                success: false,
+                message: "Level number and speciality ID are required"
+            });
         }
-        res.status(200).json(level);
-    }catch(err){
-        res.status(500).json({ message: err.message });
+
+        const level = await LevelModel.createLevel(num_level, speciality_id);
+        
+        res.status(201).json({
+            success: true,
+            message: "Level created successfully",
+            data: level
+        });
+    } catch (error) {
+        console.error("Error in createLevel controller:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
     }
 };
 
-const updateLevelById = async (req, res) => {
-    try{
-        const { id } = req.params;
-        const level = await Level.update(id, req.body);
-        if(!level){
-            return res.status(404).json({ message: 'Level not found' });
+const getLevelsBySpeciality = async (req, res) => {
+    try {
+        const { speciality_id } = req.params;
+        
+        if (!speciality_id) {
+            return res.status(400).json({
+                success: false,
+                message: "Speciality ID is required"
+            });
         }
-        res.status(200).json(level);
-    
-    }catch(err){
-        res.status(400).json({ message: err.message });
+
+        const levels = await LevelModel.getLevelsBySpeciality(speciality_id);
+        
+        res.status(200).json({
+            success: true,
+            message: "Levels retrieved successfully",
+            data: levels
+        });
+    } catch (error) {
+        console.error("Error in getLevelsBySpeciality controller:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
     }
 };
 
-const deleteLevelById = async (req, res) => {
-    try{
+const deleteLevel = async (req, res) => {
+    try {
         const { id } = req.params;
-        const level = await Level.deleteById(id);
-        if(!level){
-            return res.status(404).json({ message: 'Level not found' });
+        
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "Level ID is required"
+            });
         }
-        res.status(200).json({ message: 'Level deleted successfully' });
-    }catch(err){
-        res.status(500).json({ message: err.message });
+
+        const level = await LevelModel.deleteLevelById(id);
+        
+        if (!level) {
+            return res.status(404).json({
+                success: false,
+                message: "Level not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Level deleted successfully",
+            data: level
+        });
+    } catch (error) {
+        console.error("Error in deleteLevel controller:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
     }
 };
 
-const LevelController = {
+module.exports = {
     createLevel,
-    getLevelsBySpecId,
-    getLevelById,
-    updateLevelById,
-    deleteLevelById,
+    getLevelsBySpeciality,
+    deleteLevel
 };
-
-module.exports = LevelController;

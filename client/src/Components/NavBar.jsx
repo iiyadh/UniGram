@@ -45,7 +45,6 @@ const NavBar = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '2px solid #016FB9',
-            marginLeft: '39px',
         }}
         >
             <div className='logo' style={{ color: '#000', fontSize: '24px', fontWeight: 'bold' }}>
@@ -53,10 +52,12 @@ const NavBar = () => {
                 UniCord
             </div>
             <div>
+                <Link to="/dashboard">
                 <a className='links' href="#" style={{ marginRight: '20px', fontSize: '16px' }}>
                     <ProjectOutlined style={{marginRight: '5px'}} />
-                    Dashboard
+                    Structure
                 </a>
+                </Link>
                 <a className='links' href="#" style={{ marginRight: '20px', fontSize: '16px' }}>
                     <UserOutlined style={{marginRight: '5px'}} />
                     Edit Profile

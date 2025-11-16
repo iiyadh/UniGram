@@ -7,8 +7,8 @@ const MainContent = () => {
   return (
     <div className="dashboard" style={{ minHeight: '100vh', background: '#f5f5f5' }}>
       <NavBar />
-      <SideBar />
-      <div 
+      {/* <SideBar /> */}
+      {/* <div 
         className="main-content" 
         style={{ 
           marginLeft: '250px',
@@ -16,10 +16,9 @@ const MainContent = () => {
           minHeight: 'calc(100vh - 64px)',
           top: '150px',
           transition: 'margin-left 0.2s'
-        }}
-      >
+        }}>
+      </div> */}
         <Outlet />
-      </div>
     </div>
   )
 }

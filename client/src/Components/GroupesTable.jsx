@@ -1,80 +1,100 @@
-import { useState } from "react"
-import { Table, Input, Button, Popconfirm, message, Space, Card, Select } from "antd"
+import { useState, useEffect } from "react"
+import { Table, Input, Button, Popconfirm, message, Space, Card } from "antd"
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import '../styles/dashboard.scss'
+import { useAcademyStore } from '../store/academyStore'
+import '../styles/dashboard.scss';
+import { useParams } from 'react-router-dom';
 
-const { Option } = Select
 
 const GroupesTable = () => {
-  const [data, setData] = useState([
-    { id: 1, code_groupe: "G1-INF", level_id: 1 },
-    { id: 2, code_groupe: "G2-INF", level_id: 1 },
-    { id: 3, code_groupe: "G1-MATH", level_id: 3 },
-  ])
+  const { 
+    groups,
+    fetchGroups, 
+    createGroup, 
+    updateGroup, 
+    deleteGroup 
+  } = useAcademyStore();
 
-  const [levels] = useState([
-    { id: 1, num_level: 1, speciality: "Informatique" },
-    { id: 2, num_level: 2, speciality: "Informatique" },
-    { id: 3, num_level: 1, speciality: "Mathématiques" },
-  ])
+  const [loading, setLoading] = useState(false);
+  const { levelid } = useParams();
 
-  const [editId, setEditId] = useState(null)
-  const [editRow, setEditRow] = useState({})
-  const [newGroup, setNewGroup] = useState({ code_groupe: "", level_id: "" })
+  const [editId, setEditId] = useState(null);
+  const [editRow, setEditRow] = useState({});
+  const [newGroup, setNewGroup] = useState({ code_groupe: "", level_id: "" });
+
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  const loadInitialData = async () => {
+    setLoading(true);
+    await fetchGroups(levelid);
+    setLoading(false);
+  };
 
   const handleEdit = (row) => {
     setEditId(row.id)
     setEditRow({ ...row })
-  }
+  };
 
-  const handleSave = () => {
-    if (!editRow.code_groupe?.trim() || !editRow.level_id) {
+  const handleSave = async () => {
+    if (!editRow.code_groupe?.trim()) {
       message.warning("All fields are required")
       return
     }
-    setData(prev => prev.map(item => 
-      item.id === editId ? { 
-        ...editRow, 
-        code_groupe: editRow.code_groupe.trim()
-      } : item
-    ))
-    setEditId(null)
-    setEditRow({})
-    message.success("Group updated successfully")
-  }
+    setLoading(true)
+    const result = await updateGroup(editId, {
+      id : editId,
+      code_groupe: editRow.code_groupe.trim(),
+    });
+    if (result.success) {
+      setEditId(null)
+      setEditRow({})
+      message.success("Group updated successfully")
+    } else {
+      message.error(result.error)
+    }
+    setLoading(false)
+  };
 
   const handleCancel = () => {
     setEditId(null)
     setEditRow({})
-  }
+  };
 
-  const handleDelete = (id) => {
-    setData(prev => prev.filter(item => item.id !== id))
-    message.success("Group deleted successfully")
-  }
+  const handleDelete = async (id) => {
+    setLoading(true)
+    const result = await deleteGroup(id)
+    if (result.success) {
+      message.success("Group deleted successfully")
+    } else {
+      message.error(result.error)
+    }
+    setLoading(false)
+  };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const code = newGroup.code_groupe.trim()
-    const levelId = newGroup.level_id
+    const levelId = levelid
 
     if (!code || !levelId) {
       message.warning("Please fill all fields")
       return
     }
 
-    const nextId = data.length ? Math.max(...data.map(d => d.id)) + 1 : 1
-    setData(prev => [...prev, { 
-      id: nextId, 
-      code_groupe: code, 
-      level_id: levelId 
-    }])
-    setNewGroup({ code_groupe: "", level_id: "" })
-    message.success("Group added successfully")
-  }
+    setLoading(true)
+    const result = await createGroup({
+      code_groupe: code,
+      level_id : levelId
+    });
 
-  const getLevelDisplay = (levelId) => {
-    const level = levels.find(l => l.id === levelId)
-    return level ? `Level ${level.num_level} - ${level.speciality}` : levelId
+    if (result.success) {
+      setNewGroup({ code_groupe: "", level_id: levelid })
+      message.success("Group added successfully")
+    } else {
+      message.error(result.error)
+    }
+    setLoading(false)
   }
 
   const columns = [
@@ -101,29 +121,6 @@ const GroupesTable = () => {
           />
         ) : (
           <span className="group-code">{record.code_groupe}</span>
-        ),
-    },
-    {
-      title: "Level",
-      dataIndex: "level_id",
-      key: "level_id",
-      render: (_, record) =>
-        editId === record.id ? (
-          <Select
-            value={editRow.level_id}
-            onChange={(value) => setEditRow({ ...editRow, level_id: value })}
-            style={{ width: '100%' }}
-            size="small"
-            className="edit-select"
-          >
-            {levels.map(level => (
-              <Option key={level.id} value={level.id}>
-                Level {level.num_level} - {level.speciality}
-              </Option>
-            ))}
-          </Select>
-        ) : (
-          <span className="level-info">{getLevelDisplay(record.level_id)}</span>
         ),
     },
     {
@@ -186,7 +183,7 @@ const GroupesTable = () => {
       title="Groups Management" 
       className="groups-card"
       extra={
-        <span className="total-count">{data.length} groups</span>
+        <span className="total-count">{(groups || []).length} groups</span>
       }
     >
       <div className="table-toolbar">
@@ -199,19 +196,6 @@ const GroupesTable = () => {
             allowClear
             style={{ width: 180 }}
           />
-          <Select
-            placeholder="Select Level"
-            value={newGroup.level_id}
-            onChange={(value) => setNewGroup({ ...newGroup, level_id: value })}
-            style={{ width: 250 }}
-            className="add-select"
-          >
-            {levels.map(level => (
-              <Option key={level.id} value={level.id}>
-                Level {level.num_level} - {level.speciality}
-              </Option>
-            ))}
-          </Select>
           <Button 
             type="primary" 
             onClick={handleAdd} 
@@ -224,10 +208,11 @@ const GroupesTable = () => {
       </div>
 
       <Table
-        dataSource={data}
+        dataSource={groups}
         columns={columns}
         rowKey="id"
         className="groups-table"
+        loading={loading}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,

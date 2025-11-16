@@ -34,13 +34,13 @@ const router = createBrowserRouter([
             { path: 'dashboard', element: <MainContent />, 
                 children : [
                     { index: true, element: <Navigate to="dep" replace /> },
-                    { path: 'dep', element: <DepartementTable />},
+                    { path: 'dep', element: <DepartementTable /> },
                     { path : 'students', element: <StudentsTable />},
-                    { path : 'classrooms', element: <ClassroomsTable />},
-                    { path : 'groupes', element: <GroupesTable />},
-                    { path : 'levels', element: <LevelsTable />},
-                    { path : 'specialties', element: <SpecialtyTable />},
-                    { path : 'subjects', element: <SubjectsTable />},
+                    { path : 'classrooms/:depid', element: <ClassroomsTable />},
+                    { path : 'groupes/:levelid', element: <GroupesTable />},
+                    { path : 'levels/:specid', element: <LevelsTable />},
+                    { path : 'specialties/:depid', element: <SpecialtyTable />},
+                    { path : 'subjects/:levelid', element: <SubjectsTable />},
                 ]
             }
         ]

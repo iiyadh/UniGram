@@ -1,46 +1,61 @@
-import { useState } from "react"
-import { Table, Input, Button, Popconfirm, message, Space, Card, Select } from "antd"
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import '../styles/dashboard.scss'
-
-const { Option } = Select
+import { useState, useEffect } from "react";
+import { Table, Input, Button, Popconfirm, message, Space, Card, Select,Dropdown } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined ,UnorderedListOutlined ,MoreOutlined } from '@ant-design/icons';
+import { useAcademyStore } from '../store/academyStore';
+import { useParams } from "react-router-dom";
+import '../styles/dashboard.scss';
+import { useNavigate } from "react-router-dom";
 
 const SpecialtyTable = () => {
-  const [data, setData] = useState([
-    { id: 1, code_speciality: "INF", name_speciality: "Informatique", departement_id: "D001" },
-    { id: 2, code_speciality: "MATH", name_speciality: "Mathématiques", departement_id: "D002" },
-  ])
-
-  const [departments] = useState([
-    { id: "D001", name: "Informatique" },
-    { id: "D002", name: "Mathématiques" },
-  ])
+  const { 
+    specialties,
+    fetchSpecialties, 
+    createSpecialty, 
+    updateSpecialty, 
+    deleteSpecialty 
+  } = useAcademyStore()
+  const [loading, setLoading] = useState(false)
+  const { depid } = useParams();
+  const navigate = useNavigate();
 
   const [editId, setEditId] = useState(null)
   const [editRow, setEditRow] = useState({})
-  const [newSpecialty, setNewSpecialty] = useState({ code_speciality: "", name_speciality: "", departement_id: "" })
-  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [newSpecialty, setNewSpecialty] = useState({ code_speciality: "", name_speciality: "" , departement_id: depid ? parseInt(depid) : "" })
+
+  useEffect(() => {
+    loadInitialData()
+  }, [])
+
+  const loadInitialData = async () => {
+    setLoading(true)
+    await fetchSpecialties(depid),
+    setLoading(false)
+  }
 
   const handleEdit = (row) => {
     setEditId(row.id)
     setEditRow({ ...row })
   }
 
-  const handleSave = () => {
-    if (!editRow.code_speciality?.trim() || !editRow.name_speciality?.trim() || !editRow.departement_id) {
+  const handleSave = async () => {
+    if (!editRow.code_speciality?.trim() || !editRow.name_speciality?.trim()) {
       message.warning("All fields are required")
       return
     }
-    setData(prev => prev.map(item => 
-      item.id === editId ? { 
-        ...editRow, 
-        code_speciality: editRow.code_speciality.trim(),
-        name_speciality: editRow.name_speciality.trim()
-      } : item
-    ))
-    setEditId(null)
-    setEditRow({})
-    message.success("Specialty updated successfully")
+    setLoading(true)
+    const result = await updateSpecialty(editId, {
+      code_speciality: editRow.code_speciality.trim(),
+      name_speciality: editRow.name_speciality.trim(),
+    });
+    console.log(result);
+    if (result.success) {
+      setEditId(null)
+      setEditRow({})
+      message.success("Specialty updated successfully")
+    } else {
+      message.error(result.error)
+    }
+    setLoading(false)
   }
 
   const handleCancel = () => {
@@ -48,12 +63,18 @@ const SpecialtyTable = () => {
     setEditRow({})
   }
 
-  const handleDelete = (id) => {
-    setData(prev => prev.filter(item => item.id !== id))
-    message.success("Specialty deleted successfully")
+  const handleDelete = async (id) => {
+    setLoading(true)
+    const result = await deleteSpecialty(id)
+    if (result.success) {
+      message.success("Specialty deleted successfully")
+    } else {
+      message.error(result.error)
+    }
+    setLoading(false)
   }
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const code = newSpecialty.code_speciality.trim()
     const name = newSpecialty.name_speciality.trim()
     const deptId = newSpecialty.departement_id
@@ -63,15 +84,18 @@ const SpecialtyTable = () => {
       return
     }
 
-    const nextId = data.length ? Math.max(...data.map(d => d.id)) + 1 : 1
-    setData(prev => [...prev, { 
-      id: nextId, 
-      code_speciality: code, 
-      name_speciality: name, 
-      departement_id: deptId 
-    }])
-    setNewSpecialty({ code_speciality: "", name_speciality: "", departement_id: "" })
-    message.success("Specialty added successfully")
+    setLoading(true)
+    const result = await createSpecialty(deptId, {
+      code_speciality: code,
+      name_speciality: name
+    })
+    if (result.success) {
+      setNewSpecialty({ code_speciality: "", name_speciality: "", departement_id: "" })
+      message.success("Specialty added successfully")
+    } else {
+      message.error(result.error)
+    }
+    setLoading(false)
   }
 
   const columns = [
@@ -115,30 +139,6 @@ const SpecialtyTable = () => {
           />
         ) : (
           <span className="specialty-name">{record.name_speciality}</span>
-        ),
-    },
-    {
-      title: "Department",
-      dataIndex: "departement_id",
-      key: "departement_id",
-      width: 150,
-      render: (_, record) =>
-        editId === record.id ? (
-          <Select
-            value={editRow.departement_id}
-            onChange={(value) => setEditRow({ ...editRow, departement_id: value })}
-            style={{ width: '100%' }}
-            size="small"
-            className="edit-select"
-          >
-            {departments.map(dept => (
-              <Option key={dept.id} value={dept.id}>{dept.name}</Option>
-            ))}
-          </Select>
-        ) : (
-          <span className="department-id">
-            {departments.find(d => d.id === record.departement_id)?.name || record.departement_id}
-          </span>
         ),
     },
     {
@@ -191,6 +191,28 @@ const SpecialtyTable = () => {
                 size="small"
               />
             </Popconfirm>
+            <Dropdown
+              trigger={["click"]}
+              placement="bottomRight"
+              menu={{
+                items: [
+                  { 
+                    key: "manage-levels", 
+                    label: "Manage Levels",
+                    icon: <UnorderedListOutlined />
+                  },
+                ],
+                onClick: ({ key }) => {
+                    navigate(`/dashboard/levels/${record.id}`);
+                },
+              }}
+            >
+              <Button
+                type="text"
+                size="small"
+                icon={<MoreOutlined style={{ rotate: "90deg" }} />}
+              />
+            </Dropdown>
           </Space>
         ),
     },
@@ -201,7 +223,7 @@ const SpecialtyTable = () => {
       title="Specialties Management" 
       className="specialty-card"
       extra={
-        <span className="total-count">{data.length} specialties</span>
+        <span className="total-count">{specialties.length} specialties</span>
       }
     >
       <div className="table-toolbar">
@@ -222,17 +244,6 @@ const SpecialtyTable = () => {
             allowClear
             style={{ width: 200 }}
           />
-          <Select
-            placeholder="Select Department"
-            value={newSpecialty.departement_id}
-            onChange={(value) => setNewSpecialty({ ...newSpecialty, departement_id: value })}
-            style={{ width: 180 }}
-            className="add-select"
-          >
-            {departments.map(dept => (
-              <Option key={dept.id} value={dept.id}>{dept.name}</Option>
-            ))}
-          </Select>
           <Button 
             type="primary" 
             onClick={handleAdd} 
@@ -245,10 +256,11 @@ const SpecialtyTable = () => {
       </div>
 
       <Table
-        dataSource={data}
+        dataSource={specialties}
         columns={columns}
         rowKey="id"
         className="specialty-table"
+        loading={loading}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,

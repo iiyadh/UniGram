@@ -115,7 +115,7 @@
   
   .capacity {
     font-weight: 600;
-    color: #fa8c16;
+    color: #000f63;
   }
   
   .classroom-type {
@@ -125,8 +125,14 @@
   }
   
   .department-name {
-    color: #722ed1;
+    display: inline-block;
+    background: #e6f0ff;
+    color: #003cff;
+    text-shadow: 1px 1px 5px #003cff;
     font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
   }
 }
 
@@ -470,4 +476,10 @@
   &::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
   }
+}
+
+
+.none-tag {
+  color: #bfbfbf;
+  font-style: italic;
 }

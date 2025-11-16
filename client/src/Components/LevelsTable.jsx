@@ -1,211 +1,164 @@
-import { useState } from "react"
-import { Table, Input, Button, Popconfirm, message, Space, Card, Select, InputNumber } from "antd"
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import '../styles/dashboard.scss'
-
-const { Option } = Select
+import { useState, useEffect } from "react";
+import {
+  Table,
+  InputNumber,
+  Button,
+  Popconfirm,
+  message,
+  Space,
+  Card,
+  Dropdown,
+} from "antd";
+import {
+  DeleteOutlined,
+  PlusOutlined,
+  BookOutlined,
+  TeamOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
+import { useAcademyStore } from "../store/academyStore";
+import "../styles/dashboard.scss";
+import { useParams, useNavigate } from "react-router-dom";
 
 const LevelsTable = () => {
-  const [data, setData] = useState([
-    { id: 1, num_level: 1, speciality_id: "INF" },
-    { id: 2, num_level: 2, speciality_id: "INF" },
-    { id: 3, num_level: 1, speciality_id: "MATH" },
-  ])
+  const { levels = [], fetchLevels, createLevel, deleteLevel } = useAcademyStore();
+  const { specid } = useParams();
+  const navigate = useNavigate();
 
-  const [specialties] = useState([
-    { id: "INF", name: "Informatique" },
-    { id: "MATH", name: "Mathématiques" },
-  ])
+  const [loading, setLoading] = useState(false);
 
-  const [editId, setEditId] = useState(null)
-  const [editRow, setEditRow] = useState({})
-  const [newLevel, setNewLevel] = useState({ num_level: "", speciality_id: "" })
+  const [newLevel, setNewLevel] = useState({
+    num_level: null,
+    speciality_id: specid ? Number(specid) : null,
+  });
 
-  const handleEdit = (row) => {
-    setEditId(row.id)
-    setEditRow({ ...row })
-  }
+  // ─────────────────── FETCH LEVELS
+  useEffect(() => {
+    if (!specid) return;
+    fetchLevels(specid);
+  }, [specid, fetchLevels]);
 
-  const handleSave = () => {
-    if (!editRow.num_level || !editRow.speciality_id) {
-      message.warning("All fields are required")
-      return
+  // ─────────────────── DELETE LEVEL
+  const handleDelete = async (id) => {
+    setLoading(true);
+    const result = await deleteLevel(id);
+
+    if (result.success) {
+      message.success("Level deleted successfully");
+      await fetchLevels(specid);
+    } else {
+      message.error(result.error || "Failed to delete level");
     }
-    setData(prev => prev.map(item => 
-      item.id === editId ? editRow : item
-    ))
-    setEditId(null)
-    setEditRow({})
-    message.success("Level updated successfully")
-  }
+    setLoading(false);
+  };
 
-  const handleCancel = () => {
-    setEditId(null)
-    setEditRow({})
-  }
+  // ─────────────────── ADD LEVEL
+  const handleAdd = async () => {
+    const { num_level, speciality_id } = newLevel;
 
-  const handleDelete = (id) => {
-    setData(prev => prev.filter(item => item.id !== id))
-    message.success("Level deleted successfully")
-  }
-
-  const handleAdd = () => {
-    if (!newLevel.num_level || !newLevel.speciality_id) {
-      message.warning("Please fill all fields")
-      return
+    if (!num_level || !speciality_id) {
+      return message.warning("Please enter a valid level number");
     }
 
-    const nextId = data.length ? Math.max(...data.map(d => d.id)) + 1 : 1
-    setData(prev => [...prev, { 
-      id: nextId, 
-      num_level: newLevel.num_level, 
-      speciality_id: newLevel.speciality_id 
-    }])
-    setNewLevel({ num_level: "", speciality_id: "" })
-    message.success("Level added successfully")
-  }
+    setLoading(true);
+    const result = await createLevel(speciality_id, { num_level });
 
+    if (result.success) {
+      message.success("Level added");
+      setNewLevel({ num_level: null, speciality_id });
+      await fetchLevels(specid);
+    } else {
+      message.error(result.error);
+    }
+
+    setLoading(false);
+  };
+
+  // ─────────────────── TABLE COLUMNS
   const columns = [
-    { 
-      title: "ID", 
-      dataIndex: "id", 
-      key: "id", 
-      width: 80,
-      align: 'center'
+    {
+      title: "ID",
+      dataIndex: "id",
+      width: 60,
+      align: "center",
     },
     {
-      title: "Level Number",
+      title: "Level",
       dataIndex: "num_level",
-      key: "num_level",
-      width: 120,
-      render: (_, record) =>
-        editId === record.id ? (
-          <InputNumber
-            value={editRow.num_level}
-            onChange={(value) => setEditRow({ ...editRow, num_level: value })}
-            placeholder="Level number"
-            min={1}
-            max={10}
-            size="small"
-            className="edit-input"
-          />
-        ) : (
-          <span className="level-number">Level {record.num_level}</span>
-        ),
-    },
-    {
-      title: "Specialty",
-      dataIndex: "speciality_id",
-      key: "speciality_id",
-      render: (_, record) =>
-        editId === record.id ? (
-          <Select
-            value={editRow.speciality_id}
-            onChange={(value) => setEditRow({ ...editRow, speciality_id: value })}
-            style={{ width: '100%' }}
-            size="small"
-            className="edit-select"
-          >
-            {specialties.map(spec => (
-              <Option key={spec.id} value={spec.id}>{spec.name}</Option>
-            ))}
-          </Select>
-        ) : (
-          <span className="specialty-name">
-            {specialties.find(s => s.id === record.speciality_id)?.name || record.speciality_id}
-          </span>
-        ),
+      render: (v) => <b>Level {v}</b>,
     },
     {
       title: "Actions",
-      key: "actions",
-      width: 120,
-      align: 'center',
-      render: (_, record) =>
-        editId === record.id ? (
-          <Space size="small" className="action-buttons">
-            <Button 
-              type="primary" 
-              onClick={handleSave} 
-              size="small"
-              className="save-btn"
-            >
-              Save
-            </Button>
-            <Button 
-              onClick={handleCancel}
-              size="small"
-              className="cancel-btn"
-            >
-              Cancel
-            </Button>
-          </Space>
-        ) : (
-          <Space size="small" className="action-buttons">
+      align: "center",
+      width: 150,
+      render: (_, record) => (
+        <Space size="small">
+          <Popconfirm
+            title="Delete this level?"
+            onConfirm={() => handleDelete(record.id)}
+            okType="danger"
+          >
+            <Button danger type="link" icon={<DeleteOutlined />} />
+          </Popconfirm>
+
+          <Dropdown
+            trigger={["click"]}
+            menu={{
+              items: [
+                {
+                  key: "subjects",
+                  label: "Manage Subjects",
+                  icon: <BookOutlined />,
+                },
+                {
+                  key: "groupes",
+                  label: "Manage Groupes",
+                  icon: <TeamOutlined />,
+                },
+              ],
+              onClick: ({ key }) => {
+                navigate(
+                  key === "subjects"
+                    ? `/dashboard/subjects/${record.id}`
+                    : `/dashboard/groupes/${record.id}`
+                );
+              },
+            }}
+          >
             <Button
-              type="link"
-              onClick={() => handleEdit(record)}
-              icon={<EditOutlined />}
-              className="edit-btn"
+              type="text"
               size="small"
+              icon={<MoreOutlined rotate={90} />}
             />
-            <Popconfirm
-              title="Delete this level?"
-              description="Are you sure you want to delete this level?"
-              okText="Yes"
-              cancelText="No"
-              onConfirm={() => handleDelete(record.id)}
-              okType="danger"
-              className="delete-confirm"
-            >
-              <Button 
-                type="link" 
-                danger 
-                icon={<DeleteOutlined />}
-                className="delete-btn"
-                size="small"
-              />
-            </Popconfirm>
-          </Space>
-        ),
+          </Dropdown>
+        </Space>
+      ),
     },
-  ]
+  ];
 
   return (
-    <Card 
-      title="Levels Management" 
+    <Card
+      title="Levels Management"
+      extra={<span>{levels.length} levels</span>}
       className="levels-card"
-      extra={
-        <span className="total-count">{data.length} levels</span>
-      }
     >
       <div className="table-toolbar">
-        <Space wrap size="middle" className="toolbar-actions">
+        <Space>
           <InputNumber
             placeholder="Level Number"
-            value={newLevel.num_level}
-            onChange={(value) => setNewLevel({ ...newLevel, num_level: value })}
             min={1}
             max={10}
-            className="add-input"
-            style={{ width: 150 }}
+            value={newLevel.num_level}
+            onChange={(v) =>
+              setNewLevel((prev) => ({ ...prev, num_level: Number(v) }))
+            }
           />
-          <Select
-            placeholder="Select Specialty"
-            value={newLevel.speciality_id}
-            onChange={(value) => setNewLevel({ ...newLevel, speciality_id: value })}
-            style={{ width: 200 }}
-            className="add-select"
-          >
-            {specialties.map(spec => (
-              <Option key={spec.id} value={spec.id}>{spec.name}</Option>
-            ))}
-          </Select>
-          <Button 
-            type="primary" 
-            onClick={handleAdd} 
+
+          <Button
+            type="primary"
             icon={<PlusOutlined />}
-            className="add-btn"
+            onClick={handleAdd}
+            loading={loading}
           >
             Add Level
           </Button>
@@ -213,22 +166,14 @@ const LevelsTable = () => {
       </div>
 
       <Table
-        dataSource={data}
-        columns={columns}
         rowKey="id"
-        className="levels-table"
-        pagination={{
-          pageSize: 10,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) => 
-            `${range[0]}-${range[1]} of ${total} items`
-        }}
-        size="middle"
-        scroll={{ x: 600 }}
+        columns={columns}
+        dataSource={levels}
+        loading={loading}
+        pagination={{ pageSize: 10 }}
       />
     </Card>
-  )
-}
+  );
+};
 
 export default LevelsTable;

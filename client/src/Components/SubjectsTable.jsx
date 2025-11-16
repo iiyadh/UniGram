@@ -1,87 +1,121 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Table, Input, Button, Popconfirm, message, Space, Card, Select, InputNumber ,Tag } from "antd"
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import '../styles/dashboard.scss'
+import { useAcademyStore } from '../store/academyStore';
+import '../styles/dashboard.scss';
+import { useParams } from "react-router-dom";
 
 const { Option } = Select
 
 const SubjectsTable = () => {
-  const [data, setData] = useState([
-    { id: 1, type_subject: "Theory", name_subject: "Algorithms", id_level: 1, credits: 4, coefficient: 3 },
-    { id: 2, type_subject: "Practical", name_subject: "Programming Lab", id_level: 1, credits: 2, coefficient: 2 },
-  ])
+  const { 
+    subjects,  
+    fetchSubjects, 
+    createSubject, 
+    updateSubject, 
+    deleteSubject 
+  } = useAcademyStore();
+  const [loading, setLoading] = useState(false);
+  const { levelid } = useParams();
 
-  const [levels] = useState([
-    { id: 1, num_level: 1, speciality: "Informatique" },
-    { id: 2, num_level: 2, speciality: "Informatique" },
-  ])
-
-  const [subjectTypes] = useState(["Theory", "Practical", "Project", "Seminar"])
-
+  const [subjectTypes] = useState(["Course", "Practical", "Tutorial"])
   const [editId, setEditId] = useState(null)
   const [editRow, setEditRow] = useState({})
   const [newSubject, setNewSubject] = useState({ 
     type_subject: "", 
     name_subject: "", 
-    id_level: "", 
+    id_level: levelid ? parseInt(levelid) : "",
     credits: "", 
     coefficient: "" 
   })
+  const map = {
+    "TD": "Tutorial",
+    "TP": "Practical",
+    "cours": "Course",
+    "Tutorial": "TD",
+    "Practical": "TP",
+    "Course": "cours"
+  }
+
+  useEffect(() => {
+    loadSubjects()
+  }, [])
+
+  const loadSubjects = async () => {
+    setLoading(true)
+    const result = await fetchSubjects(levelid);
+    if (!result.success) {
+      message.error(result.error)
+    }
+    setLoading(false)
+  }
 
   const handleEdit = (row) => {
     setEditId(row.id)
     setEditRow({ ...row })
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!editRow.type_subject || !editRow.name_subject?.trim() || !editRow.id_level || !editRow.credits || !editRow.coefficient) {
       message.warning("All fields are required")
       return
     }
-    setData(prev => prev.map(item => 
-      item.id === editId ? { 
-        ...editRow, 
-        name_subject: editRow.name_subject.trim()
-      } : item
-    ))
-    setEditId(null)
-    setEditRow({})
-    message.success("Subject updated successfully")
+    setLoading(true)
+    const result = await updateSubject(editId, {
+      type_subject: map[editRow.type_subject],
+      name_subject: editRow.name_subject.trim(),
+      id_level: levelid,
+      credits: editRow.credits,
+      coefficient: editRow.coefficient
+    })
+    if (result.success) {
+      setEditId(null);
+      setEditRow({});
+      message.success("Subject updated successfully");
+    } else {
+      message.error(result.error);
+    }
+    setLoading(false)
   }
 
   const handleCancel = () => {
-    setEditId(null)
-    setEditRow({})
+    setEditId(null);
+    setEditRow({});
   }
 
-  const handleDelete = (id) => {
-    setData(prev => prev.filter(item => item.id !== id))
-    message.success("Subject deleted successfully")
+  const handleDelete = async (id) => {
+    setLoading(true);
+    const result = await deleteSubject(id);
+    if (result.success) {
+      message.success("Subject deleted successfully");
+    } else {
+      message.error(result.error);
+    }
+    setLoading(false);
   }
 
-  const handleAdd = () => {
-    const { type_subject, name_subject, id_level, credits, coefficient } = newSubject
-    if (!type_subject || !name_subject.trim() || !id_level || !credits || !coefficient) {
-      message.warning("Please fill all fields")
+  const handleAdd = async () => {
+    const { type_subject, name_subject, credits, coefficient } = newSubject
+    if (!type_subject || !name_subject.trim() || !credits || !coefficient) {
+      message.warning("Please fill all fields");
       return
     }
 
-    const nextId = data.length ? Math.max(...data.map(d => d.id)) + 1 : 1
-    setData(prev => [...prev, { 
-      id: nextId, 
-      type_subject, 
-      name_subject: name_subject.trim(), 
-      id_level, 
-      credits, 
-      coefficient 
-    }])
-    setNewSubject({ type_subject: "", name_subject: "", id_level: "", credits: "", coefficient: "" })
-    message.success("Subject added successfully")
-  }
-
-  const getLevelDisplay = (levelId) => {
-    const level = levels.find(l => l.id === levelId)
-    return level ? `Level ${level.num_level} - ${level.speciality}` : levelId
+    setLoading(true)
+    const result = await createSubject({
+      type_subject : map[type_subject],
+      name_subject: name_subject.trim(),
+      id_level : levelid,
+      credits,
+      coefficient
+    })
+    if (result.success) {
+      setNewSubject({ type_subject: "", name_subject: "", id_level: "", credits: "", coefficient: "" })
+      message.success("Subject added successfully")
+    } else {
+      message.error(result.error)
+    }
+    setLoading(false)
   }
 
   const columns = [
@@ -111,8 +145,10 @@ const SubjectsTable = () => {
             ))}
           </Select>
         ) : (
-          <Tag color={record.type_subject === "Theory" ? "blue" : "green"} className="subject-type">
-            {record.type_subject}
+          <Tag color={map[record.type_subject] === "Practical" ? "blue" 
+            :
+           map[record.type_subject] === "Course" ? "red" : "green"} className="subject-type">
+            {map[record.type_subject]}
           </Tag>
         ),
     },
@@ -131,30 +167,6 @@ const SubjectsTable = () => {
           />
         ) : (
           <span className="subject-name">{record.name_subject}</span>
-        ),
-    },
-    {
-      title: "Level",
-      dataIndex: "id_level",
-      key: "id_level",
-      width: 200,
-      render: (_, record) =>
-        editId === record.id ? (
-          <Select
-            value={editRow.id_level}
-            onChange={(value) => setEditRow({ ...editRow, id_level: value })}
-            style={{ width: '100%' }}
-            size="small"
-            className="edit-select"
-          >
-            {levels.map(level => (
-              <Option key={level.id} value={level.id}>
-                Level {level.num_level} - {level.speciality}
-              </Option>
-            ))}
-          </Select>
-        ) : (
-          <span className="level-info">{getLevelDisplay(record.id_level)}</span>
         ),
     },
     {
@@ -258,7 +270,7 @@ const SubjectsTable = () => {
       title="Subjects Management" 
       className="subjects-card"
       extra={
-        <span className="total-count">{data.length} subjects</span>
+        <span className="total-count">{subjects.length} subjects</span>
       }
     >
       <div className="table-toolbar">
@@ -282,19 +294,6 @@ const SubjectsTable = () => {
             allowClear
             style={{ width: 200 }}
           />
-          <Select
-            placeholder="Level"
-            value={newSubject.id_level}
-            onChange={(value) => setNewSubject({ ...newSubject, id_level: value })}
-            style={{ width: 200 }}
-            className="add-select"
-          >
-            {levels.map(level => (
-              <Option key={level.id} value={level.id}>
-                Level {level.num_level} - {level.speciality}
-              </Option>
-            ))}
-          </Select>
           <InputNumber
             placeholder="Credits"
             value={newSubject.credits}
@@ -326,10 +325,11 @@ const SubjectsTable = () => {
       </div>
 
       <Table
-        dataSource={data}
+        dataSource={subjects}
         columns={columns}
         rowKey="id"
         className="subjects-table"
+        loading={loading}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,

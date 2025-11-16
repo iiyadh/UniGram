@@ -7,15 +7,10 @@ async function createTables() {
     uid INT REFERENCES users(id) ON DELETE CASCADE
   );
 
-  CREATE TABLE IF NOT EXISTS chefs (
-    id SERIAL PRIMARY KEY,
-    uid INT REFERENCES teachers(id) ON DELETE CASCADE
-  );
-
   CREATE TABLE IF NOT EXISTS departements (
     id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
-    chef_id INT REFERENCES chefs(id) ON DELETE SET NULL
+    uid INT REFERENCES teachers(id) ON DELETE CASCADE
   );
 
   CREATE TABLE IF NOT EXISTS specialities (
@@ -27,7 +22,7 @@ async function createTables() {
 
   CREATE TABLE IF NOT EXISTS levels(
     id SERIAL PRIMARY KEY,
-    num_level INT UNIQUE NOT NULL,
+    num_level INT NOT NULL,
     speciality_id INT REFERENCES specialities(id) ON DELETE CASCADE
   );
 
@@ -73,10 +68,6 @@ async function createTables() {
   } catch (err) {
     console.error("❌ Error creating tables:", err);
   } finally {
-    // Don't close the pool here, as it might be used elsewhere
-    // await pool.end();
   }
 }
-
-// Export the function instead of executing it immediately
 module.exports = { createTables };
