@@ -1,63 +1,62 @@
 import { useState, useEffect } from "react"
-import { Table, Input, Button, Select, Tag, Space, Card, message, Popconfirm, Upload } from "antd"
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons'
-import { useHumanStore } from '../store/humanStore'
+import { Table, Input, Button, Select, Tag, Space, Card, message, Popconfirm, Dropdown ,Modal  } from "antd"
+import { PlusOutlined, EditOutlined, DeleteOutlined ,BookOutlined ,MoreOutlined  } from '@ant-design/icons'
+import { useHumanStore } from '../store/humanStore';
+import api from '../api/interceptor';
 import '../styles/dashboard.scss';
-import api from "../api/interceptor";
+import ManageSubjectsModal from "./Modal/ManageSubjectsModal";
 
 const { Option } = Select
 
-const StudentsTable = () => {
+const TeacherTable = () => {
   const {
-    students,
+    teachers,
     loading,
-    getAllStudents,
-    createStudent,
-    updateStudent,
-    deleteStudent,
-    exportStudentsCsv,
-    importStudentsCsv
+    getAllTeachers,
+    createTeacher,
+    updateTeacher,
+    deleteTeacher,
   } = useHumanStore()
 
   const [editId, setEditId] = useState(null)
   const [editRow, setEditRow] = useState({});
-  const [groups, setGroups] = useState([]);
-  const [newStudent, setNewStudent] = useState({
+  const [subjects, setSubjects] = useState([])
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedTeacherId, setSelectedTeacherId] = useState(null)
+  const [newTeacher, setNewTeacher] = useState({
     cin: "",
     name: "",
     email: "",
-    account_status: "active",
-    group_id: ""
+    account_status: "Active",
   })
 
   useEffect(() => {
-    loadStudents();
-    fetchGroups();
+    loadTeachers();
+    loadSubjects();
   }, [])
 
-  const fetchGroups = async () => {
+  const loadTeachers = async () => {
     try {
-      const response = await api.get('/ref/api/ref/coreacademy/groups');
-      if (response.data.success) {
-        setGroups(response.data.data);
-      }
-      console.log(groups);
-    } catch (err) {
-      console.log(err)
-      message.error("Failed to load groups")
+      await getAllTeachers()
+    } catch (error) {
+      message.error("Failed to load teachers")
     }
   }
 
-  const loadStudents = async () => {
-    try {
-      await getAllStudents()
-    } catch (error) {
-      message.error("Failed to load students")
+  const loadSubjects = async () =>{
+    try{
+      const res = await api.get('/ref/api/ref/coreacademy/subjects');
+      if(res.data.success){
+        setSubjects(res.data.data);
+        console.log(res.data.data);
+      }
+    }catch(err){
+      message.error("Failed to load subjects");
     }
   }
 
   const handleEdit = (row) => {
-    setEditId(row.id)
+    setEditId(row.teacher_id)
     setEditRow({ ...row })
   }
 
@@ -67,19 +66,18 @@ const StudentsTable = () => {
       return
     }
     try {
-      await updateStudent(editId, {
+      await updateTeacher(editId, {
         cin: editRow.cin.trim(),
         name: editRow.name.trim(),
         email: editRow.email.trim(),
         account_status: editRow.account_status,
-        group_id: editRow.group_id
+
       })
       setEditId(null)
       setEditRow({})
-      message.success("Student updated successfully")
-      loadStudents();
+      message.success("Teacher updated successfully")
     } catch (error) {
-      message.error("Failed to update student")
+      message.error("Failed to update teacher")
     }
   }
 
@@ -90,76 +88,57 @@ const StudentsTable = () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteStudent(id)
-      message.success("Student deleted successfully")
+      await deleteTeacher(id)
+      message.success("Teacher deleted successfully")
     } catch (error) {
-      message.error("Failed to delete student")
+      message.error("Failed to delete teacher")
     }
   }
 
   const handleAdd = async () => {
-    const { cin, name, email, account_status, group_id } = newStudent
+    const { cin, name, email, account_status } = newTeacher;
+
+    console.log(newTeacher);
     if (!cin.trim() || !name.trim() || !email.trim()) {
       message.warning("Please fill all required fields")
       return
     }
 
     try {
-      await createStudent({
+      await createTeacher({
         cin: cin.trim(),
         name: name.trim(),
         email: email.trim(),
         account_status,
-        group_id
       })
-      loadStudents();
-      setNewStudent({
+      loadTeachers();
+      setNewTeacher({
         cin: "",
         name: "",
         email: "",
-        account_status: "active",
-        group_id: ""
+        account_status: "Active",
       })
-      message.success("Student added successfully")
+      message.success("Teacher added successfully")
     } catch (error) {
-      message.error("Failed to add student")
+      message.error("Failed to add teacher")
     }
   }
 
-  const handleImport = async (file) => {
-    try{
-      await importStudentsCsv(file);
-      message.success('Import successful');
-      loadStudents();
-      return false;
-    }catch(err){
-      message.error('Import failed');
-    }
+  const handleManageSubjects = (teacherId) => {
+    setSelectedTeacherId(teacherId)
+    setModalVisible(true)
   }
 
-  const handleExport = async () => {
-    try{
-      const file = await exportStudentsCsv();
-      const blob = new Blob([file], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.setAttribute('download', 'students.csv');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      message.success('Export successful');
-    }catch(err){
-      message.error('Export failed');
-    }
+  const handleCloseModal = () => {
+    setModalVisible(false)
+    setSelectedTeacherId(null)
   }
 
   const columns = [
     { 
       title: "ID", 
-      dataIndex: "id", 
-      key: "id", 
+      dataIndex: "teacher_id", 
+      key: "teacher_id", 
       width: 80,
       align: 'center'
     },
@@ -169,7 +148,7 @@ const StudentsTable = () => {
       key: "cin",
       width: 120,
       render: (_, record) =>
-        editId === record.id ? (
+        editId === record.teacher_id ? (
           <Input
             value={editRow.cin}
             onChange={(e) => setEditRow({ ...editRow, cin: e.target.value })}
@@ -185,7 +164,7 @@ const StudentsTable = () => {
       dataIndex: "name", 
       key: "name",
       render: (_, record) =>
-        editId === record.id ? (
+        editId === record.teacher_id ? (
           <Input
             value={editRow.name}
             onChange={(e) => setEditRow({ ...editRow, name: e.target.value })}
@@ -201,7 +180,7 @@ const StudentsTable = () => {
       dataIndex: "email", 
       key: "email",
       render: (_, record) =>
-        editId === record.id ? (
+        editId === record.teacher_id ? (
           <Input
             value={editRow.email}
             onChange={(e) => setEditRow({ ...editRow, email: e.target.value })}
@@ -218,7 +197,7 @@ const StudentsTable = () => {
       key: "account_status",
       width: 120,
       render: (_, record) =>
-        editId === record.id ? (
+        editId === record.teacher_id ? (
           <Select
             value={editRow.account_status}
             onChange={(value) => setEditRow({ ...editRow, account_status: value })}
@@ -230,44 +209,12 @@ const StudentsTable = () => {
             <Option value="inactive">Inactive</Option>
           </Select>
         ) : (
-          <Tag
-            color={
-              record.account_status?.toLowerCase() === "active"
-                ? "green"
-                : "red"
-            }
+          <Tag 
+            color={record.account_status.toUpperCase() === "ACTIVE" ? "green" : "red"} 
             className="status-tag"
           >
-            {record.account_status?.toUpperCase()}
+            {record.account_status.toUpperCase()}
           </Tag>
-        ),
-    },
-    {
-      title: "Group",
-      dataIndex: "group_id",
-      key: "group_id",
-      width: 140,
-      render: (_, record) =>
-        editId === record.id ? (
-          <Select
-            showSearch
-            size="small"
-            style={{ width: 140 }}
-            value={editRow.group_id}
-            onChange={(value) => setEditRow({ ...editRow, group_id: value })}
-            optionFilterProp="children"
-          >
-            <Option value={null}>None</Option>
-            {groups.map((g) => (
-              <Option key={g.id} value={g.id}>
-                {g.code_groupe}
-              </Option>
-            ))}
-          </Select>
-        ) : (
-          <span className="group-id">
-            {record.code_groupe || 'N/A'}
-          </span>
         ),
     },
     {
@@ -276,7 +223,7 @@ const StudentsTable = () => {
       width: 120,
       align: 'center',
       render: (_, record) =>
-        editId === record.id ? (
+        editId === record.teacher_id ? (
           <Space size="small" className="action-buttons">
             <Button 
               type="primary" 
@@ -304,11 +251,11 @@ const StudentsTable = () => {
               size="small"
             />
             <Popconfirm
-              title="Delete this student?"
-              description="Are you sure you want to delete this student?"
+              title="Delete this teacher?"
+              description="Are you sure you want to delete this teacher?"
               okText="Yes"
               cancelText="No"
-              onConfirm={() => handleDelete(record.id)}
+              onConfirm={() => handleDelete(record.teacher_id)}
               okType="danger"
               className="delete-confirm"
             >
@@ -320,6 +267,26 @@ const StudentsTable = () => {
                 size="small"
               />
             </Popconfirm>
+          <Dropdown
+              trigger={["click"]}
+              placement="bottomRight"
+              menu={{
+                items: [
+                  { 
+                    key: "manage-subjects", 
+                    label: "Manage subjects",
+                    icon : <BookOutlined />
+                   },
+                ],
+                onClick: () => handleManageSubjects(record.teacher_id),
+              }}
+            >
+              <Button
+                type="text"
+                size="small"
+                icon={<MoreOutlined style={{ rotate: "90deg" }} />}
+              />
+            </Dropdown>
           </Space>
         ),
     },
@@ -327,83 +294,48 @@ const StudentsTable = () => {
 
   return (
     <Card 
-      title="Students Management" 
-      className="students-card"
+      title="Teachers Management" 
+      className="teachers-card"
       extra={
-        <span className="total-count">{students.length} students</span>
+        <span className="total-count">{teachers.length} teachers</span>
       }
     >
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16 }}>
-        <Upload
-          accept=".csv,text/csv"
-          beforeUpload={handleImport}
-          showUploadList={false}
-          maxCount={1}
-        >
-          <Button icon={<UploadOutlined />}>Choose CSV file</Button>
-        </Upload>
-
-        <Button
-          type="primary"
-          icon={<DownloadOutlined />}
-          onClick={handleExport}
-          disabled={!students || students.length === 0}
-        >
-          Export CSV
-        </Button>
-      </div>
 
       <div className="table-toolbar">
         <Space wrap size="middle" className="toolbar-actions">
           <Input
             placeholder="CIN"
-            value={newStudent.cin}
-            onChange={(e) => setNewStudent({ ...newStudent, cin: e.target.value })}
+            value={newTeacher.cin}
+            onChange={(e) => setNewTeacher({ ...newTeacher, cin: e.target.value })}
             className="add-input"
             allowClear
             style={{ width: 120 }}
           />
           <Input
             placeholder="Name"
-            value={newStudent.name}
-            onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+            value={newTeacher.name}
+            onChange={(e) => setNewTeacher({ ...newTeacher, name: e.target.value })}
             className="add-input"
             allowClear
             style={{ width: 200 }}
           />
           <Input
             placeholder="Email"
-            value={newStudent.email}
-            onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+            value={newTeacher.email}
+            onChange={(e) => setNewTeacher({ ...newTeacher, email: e.target.value })}
             className="add-input"
             allowClear
             style={{ width: 200 }}
           />
           <Select
             placeholder="Status"
-            value={newStudent.account_status}
-            onChange={(value) => setNewStudent({ ...newStudent, account_status: value })}
+            value={newTeacher.account_status}
+            onChange={(value) => setNewTeacher({ ...newTeacher, account_status: value })}
             style={{ width: 120 }}
             className="add-select"
           >
-            <Option value="active">Active</Option>
-            <Option value="inactive">Inactive</Option>
-          </Select>
-          <Select
-            showSearch
-            placeholder="Select Group"
-            value={newStudent.group_id}
-            onChange={(value) => setNewStudent({ ...newStudent, group_id: value })}
-            style={{ width: 150 }}
-            className="add-select"
-            optionFilterProp="children"
-            allowClear
-          >
-            {groups.map((g) => (
-              <Option key={g.id} value={g.id}>
-                {g.code_groupe}
-              </Option>
-            ))}
+            <Option value="Active">Active</Option>
+            <Option value="Inactive">Inactive</Option>
           </Select>
           <Button 
             type="primary" 
@@ -411,16 +343,16 @@ const StudentsTable = () => {
             icon={<PlusOutlined />}
             className="add-btn"
           >
-            Add Student
+            Add Teacher
           </Button>
         </Space>
       </div>
 
       <Table
-        dataSource={students}
+        dataSource={teachers}
         columns={columns}
-        rowKey="id"
-        className="students-table"
+        rowKey="teacher_id"
+        className="teachers-table"
         loading={loading}
         pagination={{
           pageSize: 10,
@@ -430,10 +362,19 @@ const StudentsTable = () => {
             `${range[0]}-${range[1]} of ${total} items`
         }}
         size="middle"
-        scroll={{ x: 900 }}
+        scroll={{ x: 1000 }}
       />
+
+      {modalVisible && (
+        <ManageSubjectsModal 
+          teacherId={selectedTeacherId} 
+          subjects={subjects}
+          open={modalVisible}
+          onClose={handleCloseModal}
+        />
+      )}
     </Card>
   )
 }
 
-export default StudentsTable;
+export default TeacherTable;

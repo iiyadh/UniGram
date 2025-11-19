@@ -20,6 +20,7 @@ import GroupesTable from './Components/GroupesTable.jsx';
 import LevelsTable from './Components/LevelsTable.jsx';
 import SpecialtyTable from './Components/SpecialtyTable.jsx';
 import SubjectsTable from './Components/SubjectsTable.jsx';
+import TeacherTable from './Components/TeacherTable.jsx';
 
 const router = createBrowserRouter([
     {
@@ -41,6 +42,8 @@ const router = createBrowserRouter([
                     { path : 'levels/:specid', element: <LevelsTable />},
                     { path : 'specialties/:depid', element: <SpecialtyTable />},
                     { path : 'subjects/:levelid', element: <SubjectsTable />},
+                    { path : 'students', element: <StudentsTable />},
+                    { path : 'teachers', element: <TeacherTable />}
                 ]
             }
         ]

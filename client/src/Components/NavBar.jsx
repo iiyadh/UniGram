@@ -2,7 +2,9 @@ import LogoLight from '../assets/LogoLight.png';
 import { Button, Image } from 'antd';
 import { MoonOutlined,SunOutlined,BellOutlined,LogoutOutlined
     ,UserOutlined 
-    ,ProjectOutlined} from '@ant-design/icons';
+    ,ProjectOutlined
+    ,TeamOutlined,
+    AuditOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { Link } from 'react-router-dom';
@@ -52,9 +54,23 @@ const NavBar = () => {
                 UniCord
             </div>
             <div>
+                <Link to="/dashboard/students">
+                    <a className='links' href="#" style={{ marginRight: '20px', fontSize: '16px' }}>
+                        <TeamOutlined style={{marginRight: '5px'}} />
+                        Students
+                    </a>
+                </Link>
+
+                <Link to="/dashboard/teachers">
+                    <a className='links' href="#" style={{ marginRight: '20px', fontSize: '16px' }}>
+                        <AuditOutlined style={{marginRight: '5px'}} />
+                        Teachers
+                    </a>
+                </Link>
+
                 <Link to="/dashboard">
                 <a className='links' href="#" style={{ marginRight: '20px', fontSize: '16px' }}>
-                    <ProjectOutlined style={{marginRight: '5px'}} />
+                    <ProjectOutlined  style={{marginRight: '5px'}} />
                     Structure
                 </a>
                 </Link>

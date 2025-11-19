@@ -7,6 +7,8 @@ const levelController = require('../controllers/levelController');
 const groupController = require('../controllers/groupController');
 const subjectController = require('../controllers/subjectController');
 const classroomController = require('../controllers/classroomController');
+const studentController = require('../controllers/studentController');
+const teacherController = require('../controllers/teacherController');
 
 
 // Department Routes
@@ -46,6 +48,32 @@ router.post('/classrooms', classroomController.createClassroom);
 router.get('/classrooms/:id_departement', classroomController.getAllClassroomsByDep);
 router.put('/classrooms/:id', classroomController.updateClassroom);
 router.delete('/classrooms/:id', classroomController.deleteClassroom);
+
+
+// Student Routes
+router.post('/students', studentController.createStudent);
+router.get('/students', studentController.getAllStudents);
+router.put('/students/:studentId', studentController.updateStudent);
+router.delete('/students/:studentId', studentController.deleteStudent);
+router.post('/students/import', upload.single('file'), studentController.importStudentsCsv);
+router.get('/students/export', studentController.exportStudentsCsv);
+
+
+// Teacher Routes
+router.post('/teachers', teacherController.createTeacher);
+router.get('/teachers', teacherController.getAllTeachers);
+router.put('/teachers/:teacherId', teacherController.updateTeacher);
+router.delete('/teachers/:teacherId', teacherController.deleteTeacher);
+
+
+
+// Other Routes
+router.get('/groups', studentController.listAllGroups);
+router.get('/subjects', teacherController.listAllSubjects);
+router.post('/teacher-subject/:teacherId', teacherController.addSubjectsToTeacher);
+router.delete('/teacher-subject/:teacherId/:subjectId', teacherController.deleteSubjectsFromTeacher);
+router.get('/teacher-subject/:teacherId', teacherController.listSubjectByTeacher);
+
 
 
 
