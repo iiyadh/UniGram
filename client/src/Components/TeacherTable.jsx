@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
-import { Table, Input, Button, Select, Tag, Space, Card, message, Popconfirm, Dropdown ,Modal  } from "antd"
-import { PlusOutlined, EditOutlined, DeleteOutlined ,BookOutlined ,MoreOutlined  } from '@ant-design/icons'
+import { Table, Input, Button, Select, Tag, Space, Card, message, Popconfirm, Dropdown   } from "antd"
+import { PlusOutlined, EditOutlined, DeleteOutlined ,BookOutlined ,MoreOutlined ,ScheduleOutlined  } from '@ant-design/icons'
 import { useHumanStore } from '../store/humanStore';
 import api from '../api/interceptor';
 import '../styles/dashboard.scss';
 import ManageSubjectsModal from "./Modal/ManageSubjectsModal";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select
 
@@ -16,7 +17,8 @@ const TeacherTable = () => {
     createTeacher,
     updateTeacher,
     deleteTeacher,
-  } = useHumanStore()
+  } = useHumanStore();
+  const navigate = useNavigate();
 
   const [editId, setEditId] = useState(null)
   const [editRow, setEditRow] = useState({});
@@ -73,8 +75,8 @@ const TeacherTable = () => {
         account_status: editRow.account_status,
 
       })
-      setEditId(null)
-      setEditRow({})
+      setEditId(null);
+      setEditRow({});
       message.success("Teacher updated successfully")
     } catch (error) {
       message.error("Failed to update teacher")
@@ -277,8 +279,19 @@ const TeacherTable = () => {
                     label: "Manage subjects",
                     icon : <BookOutlined />
                    },
+                   {
+                    key: "view-schedule",
+                    label: "View Schedule",
+                    icon : <ScheduleOutlined />
+                   }
                 ],
-                onClick: () => handleManageSubjects(record.teacher_id),
+                onClick: ({ key }) => {
+                  if (key === "manage-subjects") {
+                    handleManageSubjects(record.teacher_id);
+                  } else {
+                    navigate(`/dashboard/scheduleteacher/${record.teacher_id}`);
+                  }
+                }
               }}
             >
               <Button

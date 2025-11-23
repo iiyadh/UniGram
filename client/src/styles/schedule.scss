@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=BBH+Sans+Hegarty&family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Orbitron:wght@400..900&display=swap');
+
+.btn-entry {
+    margin: 20px 200px 20px auto;
+    float: right;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 15px;
+}
+.row p{
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 28px;
+    margin: 20px auto 20px 200px;
+    float: left;
+
+}
+.parent {
+    clear: both;
+    width: 80%;
+    margin: 50px auto;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+
+    div{
+        border: 1px solid black;
+        padding: 10px 5px;
+    }
+    .days {
+        background-color: #00b7ff;
+        text-align: center;
+        font-weight: bold;
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Chakra Petch', sans-serif;
+
+    }
+
+    .time {
+        background-color: #00b7ff;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-family: 'Chakra Petch', sans-serif;
+    }
+
+    .slot {
+        height: 120px;
+        position: relative;
+        
+        .entry {
+            color: #000;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+
+            .session-now{
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                background-color: #ff4d4f;
+                color: #fff;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 2px 6px;
+                border-radius: 3px;
+                font-family: 'Chakra Petch', sans-serif;
+            }
+            
+            .entry-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                
+                .subject {
+                    font-weight: bold;
+                    font-size: 20px;
+                    margin-bottom: 2px;
+                    font-family: 'Chakra Petch', sans-serif;
+                }
+                
+                .teacher {
+                    font-size: 16px;
+                    margin-bottom: 2px;
+                    opacity: 0.9;
+                }
+                
+                .classroom {
+                    font-size: 14px;
+                    opacity: 0.8;
+                    font-style: italic;
+                }
+            }
+            
+            .entry-actions {
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                display: flex;
+                gap: 2px;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                
+                .edit-btn, .delete-btn {
+                    background: rgba(255, 255, 255, 0.9);
+                    border: 1px solid #ddd;
+                    border-radius: 3px;
+                    padding: 2px;
+                    min-width: 24px;
+                    height: 24px;
+                    
+                    &:hover {
+                        background: rgba(255, 255, 255, 1);
+                        border-color: #ccc;
+                    }
+                }
+                
+                .edit-btn {
+                    color: #1890ff;
+                    
+                    &:hover {
+                        color: #40a9ff;
+                    }
+                }
+                
+                .delete-btn {
+                    color: #ff4d4f;
+                    
+                    &:hover {
+                        color: #ff7875;
+                    }
+                }
+            }
+            
+            &:hover .entry-actions {
+                opacity: 1;
+            }
+        }
+    }
+}
+
+.teacher-view{
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 999;
+
+    &:hover{
+        background-color: #e6f7ff;
+        transform: scale(120%);
+    }
+    
+}

@@ -35,6 +35,12 @@ app.use("/ref", createProxyMiddleware({
     pathRewrite: { "^/ref": "/api/ref" }
 }));
 
+app.use("/sched", createProxyMiddleware({
+    target: "http://localhost:7000",
+    changeOrigin: true,
+    pathRewrite: { "^/sched": "/api/schedule" }
+}));
+
 app.listen(process.env.PORT || 4000, () => {
     console.log(`API Gateway running on port ${process.env.PORT || 4000}`);
 });

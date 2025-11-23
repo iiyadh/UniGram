@@ -15,10 +15,12 @@ import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
+  ScheduleOutlined,
 } from "@ant-design/icons";
 import { useAcademyStore } from "../store/academyStore";
 import "../styles/dashboard.scss";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const ClassroomsTable = () => {
   const {
@@ -278,6 +280,13 @@ const ClassroomsTable = () => {
                 icon={<DeleteOutlined />}
               />
             </Popconfirm>
+            <Link to={`/dashboard/scheduleclassroom/${r.id}`}>
+            <Button
+              size="small"
+              type="link"
+              icon={<ScheduleOutlined />}
+            ></Button>
+            </Link>
           </Space>
         ),
     },

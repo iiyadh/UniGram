@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
 import { Table, Input, Button, Popconfirm, message, Space, Card } from "antd"
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, PlusOutlined ,ScheduleOutlined } from '@ant-design/icons'
 import { useAcademyStore } from '../store/academyStore'
 import '../styles/dashboard.scss';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 
 const GroupesTable = () => {
@@ -172,6 +172,13 @@ const GroupesTable = () => {
                 className="delete-btn"
                 size="small"
               />
+              <Link to={`/dashboard/schedulegroupe/${record.id}`}>
+                <Button
+                  size="small"
+                  type="link"
+                  icon={<ScheduleOutlined />}
+                ></Button>
+              </Link>
             </Popconfirm>
           </Space>
         ),
