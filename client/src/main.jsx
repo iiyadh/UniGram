@@ -24,6 +24,7 @@ import TeacherTable from './Components/TeacherTable.jsx';
 import ScheduleGroup from './Components/ScheduleGroup.jsx';
 import ScheduleClassroom from './Components/ScheduleClassroom.jsx';
 import ScheduleTeacher from './Components/ScheduleTeacher.jsx';
+import StudentAbsenceCards from './Components/StudentAbsenceCards.jsx';
 
 const router = createBrowserRouter([
     {
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
                     { path : 'schedulegroupe/:idgroupe', element: <ScheduleGroup />},
                     { path : 'scheduleclassroom/:idclassroom', element: <ScheduleClassroom />},
                     { path : 'scheduleteacher/:idteacher', element: <ScheduleTeacher />},
+                    { path : 'absences-student/:idstudent', element: <StudentAbsenceCards />},
                 ]
             }
         ]

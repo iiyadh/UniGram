@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react"
 import { Table, Input, Button, Select, Tag, Space, Card, message, Popconfirm, Upload } from "antd"
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined ,IssuesCloseOutlined} from '@ant-design/icons'
 import { useHumanStore } from '../store/humanStore'
 import '../styles/dashboard.scss';
 import api from "../api/interceptor";
+import { Link } from "react-router-dom"
 
 const { Option } = Select
 
@@ -320,6 +321,16 @@ const StudentsTable = () => {
                 size="small"
               />
             </Popconfirm>
+            <Link to={`/dashboard/absences-student/${record.id}`}>
+              <Button
+                type="link"
+                icon={<IssuesCloseOutlined />}
+                className="view-absences-btn"
+                size="small"
+              >
+                View Absences
+              </Button>
+            </Link>
           </Space>
         ),
     },
