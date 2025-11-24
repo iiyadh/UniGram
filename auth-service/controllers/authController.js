@@ -32,7 +32,7 @@ const login = async (req,res) => {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
         });
-        res.status(200).send({ message : 'User logged in' , token: accessToken });
+        res.status(200).send({ message : 'User logged in' , token: accessToken , role: user.role , id: user.id });
     }catch(err){
         console.error(err);
         res.status(500).json({ message: 'Internal server error' });

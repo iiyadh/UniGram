@@ -2,6 +2,8 @@ const router = require('express').Router();
 const UIrequirementController = require('../controllers/UIrequirementController');
 const sessionController = require('../controllers/sessionController');
 const scheduleEntryController = require('../controllers/scheduleentryController');
+const excusedAbsenceController = require('../controllers/excusedAbsenceController');
+const notificationController = require('../controllers/notificationController');
 
 
 // UIrequirementController routes
@@ -26,12 +28,17 @@ router.put('/schedule-entries/:id', scheduleEntryController.updateScheduleEntry)
 router.delete('/schedule-entries/:id', scheduleEntryController.deleteScheduleEntry);
 
 
-router.get('/', (req, res) => {
-    res.send('Schedule Service is running');
-});
+// excusedAbsenceController routes
+router.post('/excused-absence', excusedAbsenceController.createExcusedAbsence);
+router.get('/excused-absence/:student_id', excusedAbsenceController.getAllExcusedAbsencesByStudent);
+router.put('/excused-absence/:id', excusedAbsenceController.updateExcusedAbsence);
+router.delete('/excused-absence/:id', excusedAbsenceController.deleteExcusedAbsence);
 
-
-
+// notificationController routes
+router.post('/notification', notificationController.createNotification);
+router.get('/notification/:uid', notificationController.getAllNotificationsByUser);
+router.put('/notification/:id', notificationController.markNotificationAsRead);
+router.delete('/:id', notificationController.deleteNotification);
 
 
 
