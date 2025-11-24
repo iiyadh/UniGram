@@ -19,7 +19,7 @@ const NavBar = () => {
     const navigate = useNavigate(); 
 
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const { logout } = useAuthStore();
+    const { logout , role} = useAuthStore();
 
     const handleLogout = async () => {
         
@@ -54,6 +54,7 @@ const NavBar = () => {
                 UniCord
             </div>
             <div>
+                {role === 'admin' && <>
                 <Link to="/dashboard/students">
                     <a className='links' href="#" style={{ marginRight: '20px', fontSize: '16px' }}>
                         <TeamOutlined style={{marginRight: '5px'}} />
@@ -74,6 +75,7 @@ const NavBar = () => {
                     Structure
                 </a>
                 </Link>
+                </>}
                 <a className='links' href="#" style={{ marginRight: '20px', fontSize: '16px' }}>
                     <UserOutlined style={{marginRight: '5px'}} />
                     Edit Profile

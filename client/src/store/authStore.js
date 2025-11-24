@@ -3,12 +3,17 @@ import { create } from 'zustand';
 
 export const useAuthStore = create((set) => ({
     token: null,
+    role: null,
+    id : null,
 
     
     login: async (data)=>{
         try{
             const res = await api.post('/auth/api/auth/login', data);
+            console.log(res.data);
             set({ token: res.data.token });
+            set({ role: res.data.role });
+            set({ id: res.data.id });
             return { success: true, data: res.data };
         }catch(err){
             return {

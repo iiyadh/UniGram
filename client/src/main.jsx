@@ -1,8 +1,8 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import {
-  createBrowserRouter,
-  RouterProvider,
+    createBrowserRouter,
+    RouterProvider,
 } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import App from './App.jsx'
@@ -25,35 +25,50 @@ import ScheduleGroup from './Components/ScheduleGroup.jsx';
 import ScheduleClassroom from './Components/ScheduleClassroom.jsx';
 import ScheduleTeacher from './Components/ScheduleTeacher.jsx';
 import StudentAbsenceCards from './Components/StudentAbsenceCards.jsx';
+import { useAuthStore } from './store/authStore.js';
+
+
+const { role , id } = useAuthStore.getState();
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <App />,
         children: [
-            {index: true, element: <LandingPage />},
-            { path: 'login' , element: <LoginPage /> },
-            { path: 'forget-password' , element: <ForgetPasswordPage /> },
-            { path: 'reset-password/:token' , element: <ResetPasswordPage /> },
-            { path: '*' , element: <NotFound /> },
-            { path: 'dashboard', element: <MainContent />, 
-                children : [
-                    { index: true, element: <Navigate to="dep" replace /> },
-                    { path: 'dep', element: <DepartementTable /> },
-                    { path : 'students', element: <StudentsTable />},
-                    { path : 'classrooms/:depid', element: <ClassroomsTable />},
-                    { path : 'groupes/:levelid', element: <GroupesTable />},
-                    { path : 'levels/:specid', element: <LevelsTable />},
-                    { path : 'specialties/:depid', element: <SpecialtyTable />},
-                    { path : 'subjects/:levelid', element: <SubjectsTable />},
-                    { path : 'students', element: <StudentsTable />},
-                    { path : 'teachers', element: <TeacherTable />},
-                    { path : 'schedulegroupe/:idgroupe', element: <ScheduleGroup />},
-                    { path : 'scheduleclassroom/:idclassroom', element: <ScheduleClassroom />},
-                    { path : 'scheduleteacher/:idteacher', element: <ScheduleTeacher />},
-                    { path : 'absences-student/:idstudent', element: <StudentAbsenceCards />},
-                ]
-            }
+            { index: true, element: <LandingPage /> },
+            { path: 'login', element: <LoginPage /> },
+            { path: 'forget-password', element: <ForgetPasswordPage /> },
+            { path: 'reset-password/:token', element: <ResetPasswordPage /> },
+            { path: '*', element: <NotFound /> },
+            ...(role === 'admin' ? [
+                {
+                    path: 'dashboard', element: <MainContent />,
+                    children: [
+                        { index: true, element: <Navigate to="dep" replace /> },
+                        { path: 'dep', element: <DepartementTable /> },
+                        { path: 'students', element: <StudentsTable /> },
+                        { path: 'classrooms/:depid', element: <ClassroomsTable /> },
+                        { path: 'groupes/:levelid', element: <GroupesTable /> },
+                        { path: 'levels/:specid', element: <LevelsTable /> },
+                        { path: 'specialties/:depid', element: <SpecialtyTable /> },
+                        { path: 'subjects/:levelid', element: <SubjectsTable /> },
+                        { path: 'students', element: <StudentsTable /> },
+                        { path: 'teachers', element: <TeacherTable /> },
+                        { path: 'schedulegroupe/:idgroupe', element: <ScheduleGroup /> },
+                        { path: 'scheduleclassroom/:idclassroom', element: <ScheduleClassroom /> },
+                        { path: 'scheduleteacher/:idteacher', element: <ScheduleTeacher /> },
+                    ]
+                }
+            ] : []),
+            ...(role === 'student' ? [
+                { path: 'student', element: <MainContent /> , children:[
+                { index: true, element: <Navigate to="absence-cards" replace /> },
+                { path :`/absence-cards/${id}`, element: <StudentAbsenceCards />},
+                { path : `/schedule/`, element: <ScheduleGroup />}
+            ]}
+            ] : [])
+
+            
         ]
     }
 ]);
