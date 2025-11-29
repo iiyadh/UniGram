@@ -7,6 +7,8 @@ const validateAuth = async (req, res, next) => {
     );
     if(res.data.valid){
       req.userId = res.data.userId;
+      req.userRole = res.data.userRole;
+      req.userDepartmentId = res.data.userDepartmentId;
       next();
     }else{
       return res.sendStatus(401);
@@ -16,7 +18,16 @@ const validateAuth = async (req, res, next) => {
   }
 }
 
+const authorizeRole = (allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.userRole || !allowedRoles.includes(req.userRole)) {
+      return res.status(403).json({ message: 'Access denied. Insufficient permissions.' });
+    }
+    next();
+  };
+};
 
 module.exports = {
     validateAuth,
+    authorizeRole,
 };

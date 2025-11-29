@@ -29,7 +29,18 @@ const createSpeciality = async (req, res) => {
 
 const getAllSpecialities = async (req, res) => {
     const {dep_id} = req.params;
+    const userRole = req.userRole;
+    const userDepartmentId = req.userDepartmentId;
+    
     try {
+        // Chef role can only access their own department
+        if (userRole === 'chef' && parseInt(dep_id) !== parseInt(userDepartmentId)) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only access specialties from your own department"
+            });
+        }
+
         const specialities = await SpecialityModel.getAllSpecialities(dep_id);
         
         res.status(200).json({

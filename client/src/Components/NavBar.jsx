@@ -69,7 +69,7 @@ const NavBar = () => {
                     </a>
                 </Link>
 
-                <Link to="/dashboard">
+                <Link to="/dashboard/dep">
                 <a className='links' href="#" style={{ marginRight: '20px', fontSize: '16px' }}>
                     <ProjectOutlined  style={{marginRight: '5px'}} />
                     Structure

@@ -14,6 +14,7 @@ import ResetPasswordPage from './Pages/AuthPages/ResetPasswordPage.jsx';
 import MainContent from './Pages/Dashboard/MainContent.jsx';
 import DepartementTable from './Components/DepartementTable.jsx';
 import AuthProtection from './Protection/AuthProtection.jsx';
+import RoleProtection from './Protection/RoleProtection.jsx';
 import StudentsTable from './Components/StudentsTable.jsx';
 import ClassroomsTable from './Components/ClassroomsTable.jsx';
 import GroupesTable from './Components/GroupesTable.jsx';
@@ -25,11 +26,11 @@ import ScheduleGroup from './Components/ScheduleGroup.jsx';
 import ScheduleClassroom from './Components/ScheduleClassroom.jsx';
 import ScheduleTeacher from './Components/ScheduleTeacher.jsx';
 import StudentAbsenceCards from './Components/StudentAbsenceCards.jsx';
-import { useAuthStore } from './store/authStore.js';
+import TeacherHome from './Pages/Dashboard/TeacherHome.jsx';
+import StudentHome from './Pages/Dashboard/StudentHome.jsx';
+import ChefHome from './Pages/Dashboard/ChefHome.jsx';
 
-
-const { role , id } = useAuthStore.getState();
-
+// Create static router with all routes
 const router = createBrowserRouter([
     {
         path: "/",
@@ -39,36 +40,67 @@ const router = createBrowserRouter([
             { path: 'login', element: <LoginPage /> },
             { path: 'forget-password', element: <ForgetPasswordPage /> },
             { path: 'reset-password/:token', element: <ResetPasswordPage /> },
-            { path: '*', element: <NotFound /> },
-            ...(role === 'admin' ? [
-                {
-                    path: 'dashboard', element: <MainContent />,
-                    children: [
-                        { index: true, element: <Navigate to="dep" replace /> },
-                        { path: 'dep', element: <DepartementTable /> },
-                        { path: 'students', element: <StudentsTable /> },
-                        { path: 'classrooms/:depid', element: <ClassroomsTable /> },
-                        { path: 'groupes/:levelid', element: <GroupesTable /> },
-                        { path: 'levels/:specid', element: <LevelsTable /> },
-                        { path: 'specialties/:depid', element: <SpecialtyTable /> },
-                        { path: 'subjects/:levelid', element: <SubjectsTable /> },
-                        { path: 'students', element: <StudentsTable /> },
-                        { path: 'teachers', element: <TeacherTable /> },
-                        { path: 'schedulegroupe/:idgroupe', element: <ScheduleGroup /> },
-                        { path: 'scheduleclassroom/:idclassroom', element: <ScheduleClassroom /> },
-                        { path: 'scheduleteacher/:idteacher', element: <ScheduleTeacher /> },
-                    ]
-                }
-            ] : []),
-            ...(role === 'student' ? [
-                { path: 'student', element: <MainContent /> , children:[
-                { index: true, element: <Navigate to="absence-cards" replace /> },
-                { path :`/absence-cards/${id}`, element: <StudentAbsenceCards />},
-                { path : `/schedule/`, element: <ScheduleGroup />}
-            ]}
-            ] : [])
-
             
+            // Admin routes
+            {
+                path: 'dashboard',
+                element: (
+                        <MainContent />
+                ),
+                children: [
+                    { path: 'dep', element: <DepartementTable /> },
+                    { path: 'students', element: <StudentsTable /> },
+                    { path: 'classrooms/:depid', element: <ClassroomsTable /> },
+                    { path: 'groupes/:levelid', element: <GroupesTable /> },
+                    { path: 'levels/:specid', element: <LevelsTable /> },
+                    { path: 'specialties/:depid', element: <SpecialtyTable /> },
+                    { path: 'subjects/:levelid', element: <SubjectsTable /> },
+                    { path: 'teachers', element: <TeacherTable /> },
+                    { path: 'schedulegroupe/:idgroupe', element: <ScheduleGroup /> },
+                    { path: 'scheduleclassroom/:idclassroom', element: <ScheduleClassroom /> },
+                    { path: 'scheduleteacher/:idteacher', element: <ScheduleTeacher /> },
+                ]
+            },
+            
+            // Chef (Department Head) routes
+            {
+                path: 'chef-dashboard',
+                element: (
+                        <MainContent />
+                ),
+                children: [
+                    { index: true, element: <ChefHome /> },
+                    { path: 'specialties/:depid', element: <SpecialtyTable /> },
+                ]
+            },
+            
+            // Teacher routes
+            {
+                path: 'teacher-dashboard',
+                element: (
+                        <MainContent />
+                ),
+                children: [
+                    { index: true, element: <TeacherHome /> },
+                    { path: 'schedule/:id', element: <ScheduleTeacher /> },
+                ]
+            },
+            
+            // Student routes
+            {
+                path: 'student-dashboard',
+                element: (
+                        <MainContent />
+                ),
+                children: [
+                    { index: true, element: <StudentHome /> },
+                    { path: 'absence-cards/:id', element: <StudentAbsenceCards /> },
+                    { path: 'schedule', element: <ScheduleGroup /> },
+                ]
+            },
+            
+            // Not found route
+            { path: '*', element: <NotFound /> }
         ]
     }
 ]);

@@ -5,6 +5,7 @@ export const useAuthStore = create((set) => ({
     token: null,
     role: null,
     id : null,
+    department_id: null,
 
     
     login: async (data)=>{
@@ -14,6 +15,7 @@ export const useAuthStore = create((set) => ({
             set({ token: res.data.token });
             set({ role: res.data.role });
             set({ id: res.data.id });
+            set({ department_id: res.data.department_id });
             return { success: true, data: res.data };
         }catch(err){
             return {
@@ -25,6 +27,9 @@ export const useAuthStore = create((set) => ({
 
     logout: async () => {
         set({ token: null });
+        set({ role: null });
+        set({ id: null });
+        set({ department_id: null });
         try{
             const res = await api.post('/auth/api/auth/logout');
             return { success: true, data: res.data };

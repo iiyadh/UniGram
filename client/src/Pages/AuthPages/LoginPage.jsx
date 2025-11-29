@@ -18,7 +18,11 @@ const LoginPage = () => {
             const res = await login(values);
             if(res.success){
                 console.log("Login successful:", res.data);
-                navigate('/dashboard');
+                if( res.data.role === 'admin' ) navigate('/dashboard');
+                else if( res.data.role === 'chef' ) navigate('/chef-dashboard');
+                else if( res.data.role === 'teacher' ) navigate('/teacher-dashboard');
+                else if( res.data.role === 'student' ) navigate('/student-dashboard');
+                else navigate('/');
             }else{
                 console.log("Login failed:", res.error);
             }

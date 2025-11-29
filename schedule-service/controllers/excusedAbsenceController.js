@@ -2,13 +2,26 @@ const ExcusedAbsenceModel = require('../models/excusedAbsenceCustom');
 
 const createExcusedAbsence = async (req, res) => {
     try {
-        const { student_id, schedule_entry_id, reason, date } = req.body;
+        const { teacher_id, schedule_entry_id, reason, date } = req.body;
+        const userRole = req.userRole;
+        const userId = req.userId;
 
-        if (!student_id || !schedule_entry_id || !reason) {
-            return res.status(400).json({ success: false, error: 'All required fields must be provided' });
+        // Teacher can only create excuses for themselves
+        if (userRole === 'teacher' && parseInt(teacher_id) !== parseInt(userId)) {
+            return res.status(403).json({ 
+                success: false, 
+                error: 'You can only create excused absences for yourself' 
+            });
         }
 
-        const newAbsence = await ExcusedAbsenceModel.createExcusedAbsence(student_id, schedule_entry_id, reason, date);
+        if (!teacher_id || !reason || !date) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'All required fields must be provided: teacher_id, reason, date' 
+            });
+        }
+
+        const newAbsence = await ExcusedAbsenceModel.createExcusedAbsence(teacher_id, schedule_entry_id || null, reason, date);
         res.status(201).json({ success: true, data: newAbsence });
     } catch (err) {
         console.error('Error creating excused absence:', err);
@@ -18,8 +31,19 @@ const createExcusedAbsence = async (req, res) => {
 
 const getAllExcusedAbsencesByStudent = async (req, res) => {
     try {
-        const { student_id } = req.params;
-        const absences = await ExcusedAbsenceModel.getAllExcusedAbsencesByStudent(student_id);
+        const { teacher_id } = req.params;
+        const userRole = req.userRole;
+        const userId = req.userId;
+
+        // Teacher can only view their own excused absences
+        if (userRole === 'teacher' && parseInt(teacher_id) !== parseInt(userId)) {
+            return res.status(403).json({ 
+                success: false, 
+                error: 'You can only view your own excused absences' 
+            });
+        }
+
+        const absences = await ExcusedAbsenceModel.getAllExcusedAbsencesByStudent(teacher_id);
         res.status(200).json({ success: true, data: absences });
     } catch (err) {
         console.error('Error retrieving excused absences:', err);

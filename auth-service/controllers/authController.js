@@ -3,12 +3,12 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const createAccessToken = (userId) => {
-    return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+const createAccessToken = (userId, userRole, userDepartmentId) => {
+    return jwt.sign({ userId, userRole, userDepartmentId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
 };
 
-const createRefreshToken = (userId) => {
-    return jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+const createRefreshToken = (userId, userRole, userDepartmentId) => {
+    return jwt.sign({ userId, userRole, userDepartmentId }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
 };
 
 const login = async (req,res) => {
@@ -25,14 +25,14 @@ const login = async (req,res) => {
         if(!isPasswordValid){
             return res.status(400).json({ message: 'Invalid password' });
         }
-        const accessToken = createAccessToken(user.id);
-        const refreshToken = createRefreshToken(user.id);
+        const accessToken = createAccessToken(user.id, user.role, user.department_id || null);
+        const refreshToken = createRefreshToken(user.id, user.role, user.department_id || null);
         res.cookie('token', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
         });
-        res.status(200).send({ message : 'User logged in' , token: accessToken , role: user.role , id: user.id });
+        res.status(200).send({ message : 'User logged in' , token: accessToken , role: user.role , id: user.id, department_id: user.department_id || null });
     }catch(err){
         console.error(err);
         res.status(500).json({ message: 'Internal server error' });
@@ -45,7 +45,7 @@ const refresh = (req, res) => {
 
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
         if (err) return res.sendStatus(403);
-        const newAccessToken = createAccessToken(user.userId);
+        const newAccessToken = createAccessToken(user.userId, user.userRole, user.userDepartmentId);
         res.json({ token: newAccessToken });
     });
 };

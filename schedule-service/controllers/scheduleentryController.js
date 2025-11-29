@@ -41,6 +41,13 @@ const createScheduleEntry = async (req, res) => {
 const getAllScheduleEntriesForGroupe = async (req, res) => {
     try {
         const { groupe_id } = req.params;
+        const userRole = req.userRole;
+        const userId = req.userId;
+
+        // Students can only access their own groupe's schedule
+        // This would require checking if the student belongs to this groupe
+        // For now, we allow any authenticated user; you can enhance this with student-groupe mapping
+
         const scheduleEntries = await ScheduleEntryModel.getAllScheduleEntriesForGroupe(groupe_id);
         res.status(200).json({
             success: true,
@@ -59,6 +66,17 @@ const getAllScheduleEntriesForGroupe = async (req, res) => {
 const getAllScheduleEntriesForTeacher = async (req, res) => {
     try {
         const { teacher_id } = req.params;
+        const userRole = req.userRole;
+        const userId = req.userId;
+
+        // Teacher role can only access their own schedule
+        if (userRole === 'teacher' && parseInt(teacher_id) !== parseInt(userId)) {
+            return res.status(403).json({
+                success: false,
+                error: 'You can only view your own schedule'
+            });
+        }
+
         const scheduleEntries = await ScheduleEntryModel.getAllScheduleEntriesForTeacher(teacher_id);
         res.status(200).json({
             success: true,
